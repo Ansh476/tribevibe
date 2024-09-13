@@ -32,8 +32,15 @@ const Home = () => {
             </div>
             <FaArrowCircleDown className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hover:scale-125 duration-200" size={40}/>
         </div>
-        <Joiningcom/>
-        <Creatingcom/>
+        {/* Join Community Section */}
+        <div id="joincom-section">
+            <Joiningcom />
+        </div>
+
+        {/* Create Community Section */}
+        <div id="createcom-section">
+            <Creatingcom />
+        </div>
     </div>
   );
 };
