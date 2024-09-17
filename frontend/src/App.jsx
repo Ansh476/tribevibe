@@ -1,29 +1,43 @@
 import React from 'react'
-import{BrowserRouter,Route,Routes} from 'react-router-dom'
-import Layout from './pages/Layout'
-import Home from './pages/Home'
-import About from './pages/About'
-import Joincom from './pages/Joincom'
-import Createcom from './pages/Createcom'
-import Nopage from './pages/Nopage'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import Layout from './Pages/Layout'
+import Home from './Pages/Home'
+import Joiningcom from './components/Joiningcom'
+import Creatingcom from './components/Creatingcom'
+import Error from './components/Error'
 
-const App = () => {
+function App() {
+  const routerapp = createBrowserRouter([
+    {
+      path:"/",
+      element:<Layout/>,
+      children:[
+        {
+          path:"/",
+          element:<Home/>
+        },
+        // {
+        //   path:"/about",
+        //   element:<About/>
+        // },
+        {
+          path:"/joincom",
+          element:<Joiningcom/>
+        },
+        {
+          path:"/createcom",
+          element:<Creatingcom/>
+        },
+      ],
+      errorElement:<Error/>
+    }
+  ])
+
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<Layout/>}>
-            <Route index element={<Home/>}/>
-            <Route path='/about' element={<About/>}/>
-            <Route path='/joincom' element={<Joincom/>}/>
-            <Route path='/createcom' element={<Createcom/>}/>
-            <Route path='*' element={<Nopage/>}/>
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <RouterProvider router={routerapp}></RouterProvider>
     </>
   )
 }
+
 export default App
-
-
