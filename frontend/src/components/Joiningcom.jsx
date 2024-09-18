@@ -6,7 +6,7 @@ import tec from "../assets/tech.png";
 import tre from "../assets/trek.png";
 import ar from "../assets/art.png";
 import game from "../assets/gaming.png";
-import Creatingcom from './Creatingcom';
+import { Link } from 'react-router-dom';  
 
 const Joiningcom = () => {
   return (
@@ -25,13 +25,12 @@ const Joiningcom = () => {
           <div className="text-[#bd06a2] text-base md:text-lg font-normal font-['Microsoft Sans Serif'] mb-6">
             Pool of local and global communities for <br /> events, adventures, outings and more.
           </div>
-          {/* Explore Button */}
-          <a
-            href="#explore" // Add your explore link or ID here
+          <Link
+            to="/explore" 
             className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block"
           >
             Explore
-          </a>
+          </Link>
         </div>
 
         {/* Images Container */}
@@ -45,7 +44,6 @@ const Joiningcom = () => {
                  drop-shadow-lg"
                 src={danc}
                 alt="Dance"
-                // style={{ top: '60%', left: '100%', transform: 'translate(-1%, -5%)' }} 
               />
               {/* Image 2 */}
               <img

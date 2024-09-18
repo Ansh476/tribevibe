@@ -5,6 +5,7 @@ import Home from './Pages/Home'
 import Joiningcom from './components/Joiningcom'
 import Creatingcom from './components/Creatingcom'
 import Error from './components/Error'
+import ExploreEvents from './components/ExploreEvents'
 
 function App() {
   const routerapp = createBrowserRouter([
@@ -28,6 +29,10 @@ function App() {
           path:"/createcom",
           element:<Creatingcom/>
         },
+        {
+          path: "/explore",   
+          element: <ExploreEvents />
+        }
       ],
       errorElement:<Error/>
     }
