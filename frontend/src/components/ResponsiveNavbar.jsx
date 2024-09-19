@@ -1,10 +1,31 @@
 import React from "react";
 import { FaUserCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { NavbarLinks } from "./Navbar";
+import { Link, useLocation } from "react-router-dom";
+import { Link as ScrollLink, scroller } from "react-scroll";
 
-const ResponsiveMenu = ({ showMenu, setShowMenu }) => {
-  console.log("showMenu", showMenu);
+const ResponsiveNavbar = ({ showMenu, setShowMenu }) => {
+  const location = useLocation();
+
+  const handleScrollToSection = (section) => {
+    if (location.pathname !== "/") {
+      window.location.href = "/";
+      setTimeout(() => {
+        scroller.scrollTo(section, {
+          smooth: true,
+          duration: 500,
+          offset: -50,
+        });
+      }, 100); 
+    } else {
+      scroller.scrollTo(section, {
+        smooth: true,
+        duration: 500,
+        offset: -50,
+      });
+    }
+    setShowMenu(false); 
+  };
+
   return (
     <div
       className={`${
@@ -16,22 +37,60 @@ const ResponsiveMenu = ({ showMenu, setShowMenu }) => {
           <FaUserCircle size={50} />
           <div>
             <h1 className="text-customblue">Hello User</h1>
-            <h1 className="text-sm  text-custompink">Premium user</h1>
+            <h1 className="text-sm text-custompink">Premium user</h1>
           </div>
         </div>
+
         <nav className="mt-12">
           <ul className="space-y-4 text-xl">
-            {NavbarLinks.map((data,index) => (
-              <li key={index} className="bg-gradient-to-r from-primary to-secondary">
-                <Link
-                  to={data.link}
-                  onClick={() => setShowMenu(false)}
-                  className="mb-5 inline-block text-customblue font-medium"
-                >
-                  {data.name}
-                </Link>
-              </li>
-            ))}
+            <li className="bg-gradient-to-r from-primary to-secondary">
+              <span
+                onClick={() => handleScrollToSection("home")}
+                className="mb-5 inline-block text-customblue font-medium cursor-pointer"
+              >
+                Home
+              </span>
+            </li>
+            <li className="bg-gradient-to-r from-primary to-secondary">
+              <span
+                onClick={() => handleScrollToSection("JoinCom")}
+                className="mb-5 inline-block text-customblue font-medium cursor-pointer"
+              >
+                Join Community
+              </span>
+            </li>
+            <li className="bg-gradient-to-r from-primary to-secondary">
+              <span
+                onClick={() => handleScrollToSection("CreateCom")}
+                className="mb-5 inline-block text-customblue font-medium cursor-pointer"
+              >
+                Create Community
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/login"
+                onClick={() => {
+                  setShowMenu(false);
+                  window.scrollTo(0, 0); 
+                }}
+                className="mb-5 inline-block text-customblue font-medium"
+              >
+                Login
+              </Link>
+            </li>
+            {/* <li>
+              <Link
+                to="/login"
+                onClick={() => {
+                  setShowMenu(false);
+                  window.scrollTo(0, 0); 
+                }}
+                className="mb-5 inline-block text-customblue font-medium"
+              >
+                Signup
+              </Link>
+            </li> */}
           </ul>
         </nav>
       </div>
@@ -39,4 +98,4 @@ const ResponsiveMenu = ({ showMenu, setShowMenu }) => {
   );
 };
 
-export default ResponsiveMenu;
+export default ResponsiveNavbar;
