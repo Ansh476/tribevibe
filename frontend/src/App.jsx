@@ -7,6 +7,7 @@ import Creatingcom from './components/Creatingcom'
 import Error from './components/Error'
 import Login from './components/Login'
 import ExploreEvents from './components/ExploreEvents'
+import Dashboard from './components/Dashboard'
 // import Signup from './components/Signup'
 
 function App() {
@@ -34,6 +35,10 @@ function App() {
         {
           path: "/explore",   
           element: <ExploreEvents />
+        }
+        {
+          path: "/dashboard",   
+          element: <Dashboard />
         }
         // {
         //   path:"/signup",
