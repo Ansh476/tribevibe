@@ -1,5 +1,6 @@
 import React from 'react'
 import comimg from "../assets/createcomimg.png";
+import { Link } from 'react-router-dom';
 
 const Creatingcom = () => {
   return (
@@ -25,12 +26,11 @@ const Creatingcom = () => {
             Launch your own spaces for events,<br />
             adventure, collaboration, and more.
           </div>
-          <a
-            href="#explore"
-            className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block mt-5"
-          >
+          <Link
+            to="/dashboard"
+            className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block mt-5">
             Explore
-          </a>
+          </Link>
         </div>
       </div>
     </div>
