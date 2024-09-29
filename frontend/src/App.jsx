@@ -35,10 +35,14 @@ function App() {
         {
           path: "/explore",   
           element: <ExploreEvents />
-        }
+        },
         {
           path: "/dashboard",   
           element: <Dashboard />
+        },
+        {
+          path: "/communityform",   
+          element: <Createcomform />
         }
         // {
         //   path:"/signup",
