@@ -23,7 +23,7 @@ const getAdminView = async (req, res, next) => {
 
   const deleteUser = async (req, res, next) => {
     const { userId } = req.params; 
-    const userRole = req.user.role; // Assume role is set in req.user
+    const userRole = req.user.role;
   
     try {
       if (userRole !== 'admin') {
