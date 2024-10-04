@@ -1,38 +1,79 @@
-import React from 'react';
-// import ExplorePageHead from '../assets/ExplorePageHead.png'
-import EventList from '../components/EventList';
-import { IoSearch } from "react-icons/io5"
+import React, { useState, useEffect } from 'react';
+import EventCard from './EventCard';
+import strayDogs from '../assets/strayDogs.png';
+import basketball from '../assets/basketball.png';
+import kasubai from '../assets/kasubai.png';
+import anime from '../assets/anime.png';
+import { IoSearch } from "react-icons/io5";
+import EventList from './EventList'; 
+
+const events = [
+    { title: 'Stray Dog Feeding Drive', image: strayDogs, details: 'Join us for a day of feeding stray dogs and making a difference!' },
+    { title: 'Basketball Tournament', image: basketball, details: 'Compete in our annual basketball tournament!' },
+    { title: 'Kalsubai Peak Night Trek', image: kasubai, details: 'Experience the thrill of night trekking on Kalsubai Peak.' },
+    { title: 'Anime Webtoon Manga', image: anime, details: 'A meetup for all anime and manga enthusiasts!' },
+];
 
 const Dashboard = () => {
+    const [filteredEvents, setFilteredEvents] = useState(events);
+    const [searchText, setSearchText] = useState("");
+    const [isClicked, setIsClicked] = useState(false);
+
+    const handleSearch = () => {
+        const filteredList = events.filter((event) =>
+            event.title.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setFilteredEvents(filteredList);
+
+        // Set clicked state to true and reset after a short delay
+        setIsClicked(true);
+        setTimeout(() => setIsClicked(false), 200); // Reset after 200ms
+    };
+
+    useEffect(() => {
+        if (searchText === "") {
+            setFilteredEvents(events);
+        }
+    }, [searchText]);
+
     return (
-        <div className=" bg-[#FDE3FA] min-h-screen p-[30px] mt-12">
-            <div className=' bg-white rounded-full top-48 h-[88px] w-[1106px] mx-auto overflow-hidden py-3 px-3 flex'>
-                <div className=' bg-[#FDE3FA] w-[258px] rounded-full h-[66px] px-[29px] py-[17px] flex flex-col justify-center gap-2'>
-                    <div className='relative grow shrink basis-0 self-stretch '>
-                        <div className='h-[20px] left-0  top-0 text-[#0c87f2] text-[18px] font-bold font-["League Spartan"] w-[76px] '>
-                            Where
-                        </div>
-                        <div className='h-[11px] left-0 top-[20px] absolute text-[#BE07A2] w-[200px] text-base font-medium font-["League Spartan"] mt-0.5'>
+        <div className="bg-[#FDE3FA] min-h-screen p-[30px] mt-12">
+            <div className='bg-white rounded-full h-[88px] w-[1106px] mx-auto overflow-hidden py-3 px-3 flex'>
+                <div className='bg-[#FDE3FA] w-[258px] rounded-full h-[66px] px-[29px] py-[17px] flex flex-col justify-center gap-2'>
+                    <div className='relative grow shrink basis-0 self-stretch'>
+                        <input
+                            type="text"
+                            placeholder="Where"
+                            className='h-[20px] text-[#0c87f2] text-[18px] font-bold font-["League Spartan"] w-full bg-transparent border-none focus:outline-none'
+                        />
+                        <div className='h-[11px] absolute left-0 top-[20px] text-[#BE07A2] w-[200px] text-base font-medium font-["League Spartan"] mt-0.5'>
                             Search by location
                         </div>
                     </div>
                 </div>
                 <div className='flex flex-col justify-center ml-5 mt-2'>
-                    <div className='text-[#0c87f2] font-bold font-["League Spartan"] text-lg'>
-                        Topic
-                    </div>
+                    <input
+                        type="text"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder="Topic"
+                        className='text-[#0c87f2] font-bold font-["League Spartan"] text-lg bg-transparent border-none focus:outline-none'
+                    />
                     <div className='text-[#BE07A2] font-medium font-["League Spartan"] text-sm'>
-                        search by tags
+                        Search by tags
                     </div>
                 </div>
-                <div className='ml-auto'>
-                    <IoSearch size={24} className='bg-[#d9d9d9] text-[#BE07A2] text-2xl h-[60px] w-[62px] rounded-full p-3 ' />
+                <div className='ml-auto cursor-pointer' onClick={handleSearch}>
+                    <IoSearch 
+                        size={24} 
+                        className={`bg-[#d9d9d9] text-[#BE07A2] text-2xl h-[60px] w-[62px] rounded-full p-3 transition-transform duration-200 ${isClicked ? 'transform scale-95' : ''}`} 
+                    />
                 </div>
             </div>
             <div className="text-[#BE07A2] font-poppins text-[55px] font-bold leading-[50px] mt-10 mb-10">
                 Explore
             </div>
-            <EventList />
+            <EventList events={filteredEvents} /> 
         </div>
     );
 };

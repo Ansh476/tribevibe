@@ -1,6 +1,17 @@
 import React from 'react';
-import ExplorePageHead from '../assets/ExplorePageHead.png'
+import ExplorePageHead from '../assets/ExplorePageHead.png';
 import EventList from '../components/EventList';
+import strayDogs from '../assets/strayDogs.png';
+import basketball from '../assets/basketball.png';
+import kasubai from '../assets/kasubai.png';
+import anime from '../assets/anime.png';
+
+const events = [
+    { title: 'Stray Dog Feeding Drive', image: strayDogs, details: 'Join us for a day of feeding stray dogs and making a difference!' },
+    { title: 'Basketball Tournament', image: basketball, details: 'Compete in our annual basketball tournament!' },
+    { title: 'Kalsubai Peak Night Trek', image: kasubai, details: 'Experience the thrill of night trekking on Kalsubai Peak.' },
+    { title: 'Anime Webtoon Manga', image: anime, details: 'A meetup for all anime and manga enthusiasts!' },
+];
 
 const ExploreEvents = () => {
     return (
@@ -13,7 +24,7 @@ const ExploreEvents = () => {
             <div className="text-[#BE07A2] font-poppins text-[55px] font-bold leading-[50px] mt-10 mb-10">
                 Login to see more
             </div>
-            <EventList />
+            <EventList events={events} />
         </div>
     );
 };

@@ -8,6 +8,9 @@ import Error from './components/Error'
 import Login from './components/Login'
 import ExploreEvents from './components/ExploreEvents'
 import Dashboard from './components/Dashboard'
+import CreatedComm from './components/CreatedComm'
+import Createcomform from './components/Createcomfrom'
+
 // import Signup from './components/Signup'
 
 function App() {
@@ -43,6 +46,10 @@ function App() {
         {
           path: "/communityform",   
           element: <Createcomform />
+        },
+        {
+          path: "/created",
+          element: <CreatedComm />
         }
         // {
         //   path:"/signup",

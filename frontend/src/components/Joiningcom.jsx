@@ -28,7 +28,7 @@ const Joiningcom = () => {
           <Link
             to="/explore" 
             className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block"
-          >
+            onClick={() => window.scrollTo(0, 0)}>
             Explore
           </Link>
         </div>

@@ -28,7 +28,7 @@ const Creatingcom = () => {
           </div>
           <Link
             to="/dashboard"
-            className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block mt-5">
+            className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block mt-5"onClick={() => window.scrollTo(0, 0)}>
             Explore
           </Link>
         </div>
