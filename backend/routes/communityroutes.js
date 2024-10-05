@@ -3,7 +3,7 @@ const router = express.Router();
 
 const commcontroller = require('../controllers/commcontrol');
 
-router.get('/', commcontroller.getallCommunities);
+router.get('/', commcontroller.getallComm);
 
 router.post('/', commcontroller.createcommunity);
 
@@ -16,4 +16,16 @@ router.patch('/:communityId', commcontroller.updateComm);
 router.delete('/:communityId', commcontroller.deleteComm);
 
 router.get('/users/:userId', commcontroller.getCreatorcomm);
+
+router.post('/:communityid/announcement', commcontroller.postannouncement);
+
+router.delete('/:communityid/announcement/:announcementId', commcontroller.deleteannouncement)
+
+router.delete('/:communityid/removeuser/:userId', commcontroller.removeuser)
+
+router.post('/:communityid/feedback', commcontroller.postfeedback)
+
+router.post('/:communityid/feedback', commcontroller.getfeedback)
+
+
 
