@@ -1,6 +1,7 @@
 const Community = require('../models/community');
 const User = require('../models/usermodel');
 const HttpError = require('../models/HttpError');
+const HttpError = require('../models/feedback');
 
 const createcommunity = async (req, res, next) => {
   const { title, description, location, agegrp, image, date, time, gender, membercount, creator } = req.body;
@@ -127,7 +128,7 @@ const updateComm = async (req, res, next) => {
 const deleteComm = async (req, res, next) => {
   const { communityId } = req.params;
   const userId = req.user.id; 
-  const userRole = req.user.role;
+  // const userRole = req.user.role;
 
   try {
     const community = await Community.findById(communityId).populate('creator');
@@ -169,5 +170,112 @@ const getCreatorcomm = async (req, res, next) => {
   }
 };
 
+function asyncWrap(fn){
+  return function(req,res,next){
+      fn(req,res,next).catch((err)=>{next(err)});
+  }
+}
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm};
+const postannouncement = asyncWrap(async (req, res, next) => {
+  const creatorId = req.user.id; // authentication middleware jwt req.user
+  const { message, imgfile } = req.body;
+  const { communityId } = req.params; 
+
+  const community = await Community.findById(communityId);
+  if (!community || community.creator.toString() !== creatorId) {
+    return res.status(403).json({ message: "Not authorized to post in this community" });
+  }
+
+  let newannouncement = new Announcement({
+    message: message,
+    imgfile: imgfile,
+    created_at: new Date(),
+    community: communityId,
+    creator: creatorId
+  });
+
+  await newannouncement.save();
+
+  res.status(201).json({ message: "Announcement posted successfully!" });
+});
+
+const deleteannouncement = asyncWrap(async (req, res, next) => {
+  const creatorId = req.user.id; // authentication middleware = req.user
+  const { communityId, announcementId } = req.params;
+
+  const community = await Community.findById(communityId);
+  if (!community || community.creator.toString() !== creatorId) {
+    return res.status(403).json({ message: "Not authorized to delete announcements in this community" });
+  }
+
+  const announcement = await Announcement.findById(announcementId);
+  if (!announcement || announcement.community.toString() !== communityId) {
+    return res.status(404).json({ message: "Announcement not found" });
+  }
+  await Announcement.findByIdAndDelete(announcementId);
+  res.status(200).json({ message: "Announcement deleted successfully!" });
+});
+
+
+const removeuser = async (req, res, next) => {
+  const creatorId = req.user.id; //  req.user = authenticated user
+  const { communityId, userId } = req.params;
+
+  const community = await Community.findById(communityId);
+  if (!community) {
+    return res.status(404).json({ message: "Community not found" });
+  }
+
+  if (community.creator.toString() !== creatorId) {
+    return res.status(403).json({ message: "You are not authorized to remove users from this community" });
+  }
+
+  if (!community.members.includes(userId)) {
+    return res.status(404).json({ message: "User is not a member of this community" });
+  }
+  community.members.pull(userId); 
+  await community.save();
+
+  res.status(200).json({ message: "User removed from community successfully" });
+};
+
+const postfeedback = asyncWrap(async (req, res, next) => {
+  const { feedbackmsg, rating } = req.body;
+  const { communityId } = req.params;
+  const userId = req.user.id; //authentication token
+
+  const community = await Community.findById(communityId);
+  if (!community) {
+    return res.status(404).json({ message: "Community not found" });
+  }
+  let newfeedback = new Feedback({
+    feedbackmsg: feedbackmsg,
+    rating: rating,
+    community: communityId,
+    user: userId,
+  })
+  await newfeedback.save();
+  res.status(201).json({ message: "Feedback posted successfully!" });
+});
+
+const getfeedback = async (req, res, next) => {
+  const { communityId } = req.params;
+  try{
+  const community = await Community.findById(communityId);
+  if (!community) {
+    return res.status(404).json({ message: "Community not found" });
+  }
+
+  const feedback = await Feedback.find({ community: communityId })
+    .populate('user', 'username') 
+    .populate('community', 'name'); 
+
+  res.status(200).json({ feedback });
+}catch(err){
+  res.status(500).json({ message: "Fetching feedback failed" });
+}};
+
+
+
+
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback};
