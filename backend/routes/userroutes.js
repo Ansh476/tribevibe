@@ -1,12 +1,26 @@
 const express = require('express');
+const { body } = require('express-validator'); 
 const router = express.Router();
 
-const usercontroller = require('../controllers/usercontrol')
+const userController = require('../controllers/usercontrol');
+const jwtMiddleware = require('../middleware/jwt-middleware'); 
 
-router.post('/signup',usercontroller.signup);
+// Signup route with validation
+router.post('/signup', [
+    body('username').not().isEmpty().withMessage('Username is required.'),
+    body('email').isEmail().withMessage('Invalid email address.'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long.'),
+    body('fullname').not().isEmpty().withMessage('Full name is required.'),
+    body('Phone').not().isEmpty().withMessage('Phone number is required.'),
+    body('location').not().isEmpty().withMessage('Location is required.')
+], userController.signup);
 
-router.post('/login',usercontroller.login);
+// Login route with validation
+router.post('/login', [
+    body('email').not().isEmpty().withMessage('Login field is required.'),
+    body('password').not().isEmpty().withMessage('Password is required.')
+], userController.login);
 
-router.get('/creator', usercontroller.getCreatorView);
+router.get('/creator', jwtMiddleware, userController.getCreatorView); 
 
-
+module.exports = router;

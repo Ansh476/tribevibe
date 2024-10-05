@@ -1,97 +1,119 @@
 const User = require('../models/usermodel');
 const Community = require('../models/community');
 const HttpError = require('../models/HttpError');
-const {Validationresult} = require('express-validator');
+const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-
-const signup = async () => {
-    const errors = Validationresult(req);
-    if(!errors.isEmpty()){
-        const error = new HttpError('Invalid inputs, please check your data.',422);
+const signup = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new HttpError('Invalid inputs, please check your data.', 422);
         return next(error);
     }
 
-    const {username, email,password,fullname,Phone,profilepic,location}=req.body;
+    const { username, email, password, fullname, Phone, profilepic, location } = req.body;
 
-    let existinguser 
-    try{
-        existinguser = await User.findOne({email: email})
-    }catch(err){
-        const error = new HttpError('Signup faied.',500)
+    let existingUser;
+    try {
+        existingUser = await User.findOne({ email: email });
+    } catch (err) {
+        console.error(err);
+        const error = new HttpError('Signup failed, please try again.', 500);
         return next(error);
     }
 
-    if(existinguser){
-        const error = new HttpError('Email already exists.',422)
+    if (existingUser) {
+        const error = new HttpError('Email already exists.', 422);
         return next(error);
     }
 
-    const newUser= new User({
+    const newUser = new User({
         username,
         email,
-        password,
+        password,  
         fullname,
         Phone,
         profilepic,
         location,
         communitiesCreated: [],
-        communitiesJoined: [],  
-      });
-      try{
+        communitiesJoined: [],
+    });
+
+    try {
         await newUser.save();
-      }
-      catch(err){
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
-      }
-}
+        const error = new HttpError('Signup failed, please try again.', 500);
+        return next(error);
+    }
+};
 
-const login = async () => {
-    const errors = Validationresult(req);
-    if(!errors.isEmpty()){
-        const error = new HttpError('Invalid inputs, please check your data.',422);
+
+const login = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new HttpError('Invalid inputs, please check your data.', 422);
         return next(error);
     }
 
-    const {loginfield,password}=req.body;
-
-    let existinguser 
-    try{
-        existinguser = await User.findOne({
-            $or: [
-              { email: loginfield },
-              { username: loginfield},
-              { Phone: loginfield}
-            ]
-        });
-    }catch(err){
-        const error = new HttpError('Signup faied.',500)
+    const { email, password } = req.body;
+    console.log(req.body);
+    let existingUser;
+    try {
+        existingUser = await User.findOne({ email: email });
+    } catch (err) {
+        console.error(err);
+        const error = new HttpError('Login failed, please try again.', 500);
         return next(error);
     }
-    if(!existinguser || existinguser.password === password){
-        const error = new HttpError('Invalid credentials.',500)
-        return next(error);
-    }
-}
 
+    if (!existingUser) {
+        const error = new HttpError('User not found.', 401);
+        console.log("user not found");
+        return res.status(401).json({ message: error.message });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+    console.log(`correcct password : ${existingUser.password}`);
+    if (!isPasswordValid) {
+        const error = new HttpError('Invalid credentials.', 401);
+        console.log("incorrect id/password");
+        return res.status(401).json({ message: error.message });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET);
+
+    res.status(200).json({
+        message: 'Login successful',
+        token,
+        userId: existingUser.id 
+    });
+};
+
+
+// Get creator view function
 const getCreatorView = async (req, res, next) => {
     const creatorId = req.user.id; // authentication middleware jwt req.user
     try {
-      const creator = await User.findById(creatorId).populate({
-        path: 'communitiesCreated',
-        populate: { path: 'members', select: 'username email' }
-      });
-  
-      if (!creator) {
-        return res.status(404).json({ message: 'Creator not found.' });
-      }
-      res.status(200).json({
-        message: 'Creator data fetched successfully',
-        communitiesCreated: creator.communitiesCreated
-      });
+        const creator = await User.findById(creatorId).populate({
+            path: 'communitiesCreated',
+            populate: { path: 'members', select: 'username email' }
+        });
+
+        if (!creator) {
+            return res.status(404).json({ message: 'Creator not found.' });
+        }
+        res.status(200).json({
+            message: 'Creator data fetched successfully',
+            communitiesCreated: creator.communitiesCreated
+        });
     } catch (error) {
-      res.status(500).json({ message: 'Fetching creator data failed.' });
+        console.error(error);
+        res.status(500).json({ message: 'Fetching creator data failed.' });
     }
-  };
-  
-module.exports = { getCreatorView, signup ,login};
+};
+
+module.exports = { getCreatorView, signup, login };

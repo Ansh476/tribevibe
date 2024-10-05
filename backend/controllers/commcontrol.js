@@ -1,7 +1,7 @@
 const Community = require('../models/community');
 const User = require('../models/usermodel');
 const HttpError = require('../models/HttpError');
-const HttpError = require('../models/feedback');
+const Feedback = require('../models/feedback');
 
 const createcommunity = async (req, res, next) => {
   const { title, description, location, agegrp, image, date, time, gender, membercount, creator } = req.body;
