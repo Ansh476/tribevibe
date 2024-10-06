@@ -49,7 +49,7 @@ const signup = async (req, res, next) => {
     try {
         await newUser.save();
 
-        // Generate JWT token for the new user
+        // Generate JWT token
         const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET);
 
         const transporter = nodemailer.createTransport({
@@ -68,8 +68,8 @@ const signup = async (req, res, next) => {
 
         res.status(201).json({
             message: 'User created successfully. Please check your email for the OTP.',
-            token, // Include the JWT token in the response
-            userId: newUser.id, // Optionally include the userId as well
+            token, // JWT token passed
+            userId: newUser.id,
         });
     } catch (err) {
         console.error(err);
@@ -96,8 +96,8 @@ const verifyOtp = async (req, res, next) => {
     }
 
     user.isVerified = true;
-    user.otp = undefined; // Clear OTP after verification
-    user.otpExpires = undefined; // Clear OTP expiry time
+    user.otp = undefined; // Clear OTP
+    user.otpExpires = undefined; 
 
     try {
         await user.save();
