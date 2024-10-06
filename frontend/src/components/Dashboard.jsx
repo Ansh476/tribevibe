@@ -1,40 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import EventCard from './EventCard';
-import strayDogs from '../assets/strayDogs.png';
-import basketball from '../assets/basketball.png';
-import kasubai from '../assets/kasubai.png';
-import anime from '../assets/anime.png';
+import axios from 'axios'; 
 import { IoSearch } from "react-icons/io5";
 import EventList from './EventList'; 
 
-const events = [
-    { title: 'Stray Dog Feeding Drive', image: strayDogs, details: 'Join us for a day of feeding stray dogs and making a difference!' },
-    { title: 'Basketball Tournament', image: basketball, details: 'Compete in our annual basketball tournament!' },
-    { title: 'Kalsubai Peak Night Trek', image: kasubai, details: 'Experience the thrill of night trekking on Kalsubai Peak.' },
-    { title: 'Anime Webtoon Manga', image: anime, details: 'A meetup for all anime and manga enthusiasts!' },
-];
-
 const Dashboard = () => {
-    const [filteredEvents, setFilteredEvents] = useState(events);
+    const [events, setEvents] = useState([]); 
+    const [filteredEvents, setFilteredEvents] = useState([]); 
     const [searchText, setSearchText] = useState("");
     const [isClicked, setIsClicked] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('https://localhost:5000/api/communities/');
+            const communities = response.data.communities; 
+            setEvents(communities); 
+            setFilteredEvents(communities); 
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const handleSearch = () => {
         const filteredList = events.filter((event) =>
             event.title.toLowerCase().includes(searchText.toLowerCase())
         );
         setFilteredEvents(filteredList);
-
-        // Set clicked state to true and reset after a short delay
         setIsClicked(true);
-        setTimeout(() => setIsClicked(false), 200); // Reset after 200ms
+        setTimeout(() => setIsClicked(false), 200);
     };
 
     useEffect(() => {
         if (searchText === "") {
-            setFilteredEvents(events);
+            setFilteredEvents(events); 
         }
-    }, [searchText]);
+    }, [searchText, events]); 
 
     return (
         <div className="bg-[#FDE3FA] min-h-screen p-[30px] mt-12">
