@@ -49,6 +49,9 @@ const signup = async (req, res, next) => {
     try {
         await newUser.save();
 
+        // Generate JWT token for the new user
+        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET);
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -63,13 +66,18 @@ const signup = async (req, res, next) => {
             text: `Your OTP code is ${otp}. It is valid for 15 minutes.`,
         });
 
-        res.status(201).json({ message: 'User created successfully. Please check your email for the OTP.' });
+        res.status(201).json({
+            message: 'User created successfully. Please check your email for the OTP.',
+            token, // Include the JWT token in the response
+            userId: newUser.id, // Optionally include the userId as well
+        });
     } catch (err) {
         console.error(err);
         const error = new HttpError('Signup failed, please try again.', 500);
         return next(error);
     }
 };
+
 
 const verifyOtp = async (req, res, next) => {
     const { email, otp } = req.body;
