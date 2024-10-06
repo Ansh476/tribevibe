@@ -32,6 +32,14 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    otp: {
+        type: String,
+        required: false,
+    },
+    otpExpires: {
+        type: Date,
+        required: false,
+    },
     communitiesCreated: [{ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Community'
