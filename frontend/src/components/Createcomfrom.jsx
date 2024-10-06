@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Createcomform = () => {
@@ -11,16 +12,36 @@ const Createcomform = () => {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    mode: 'onChange', // Validates on change to enable link only after all fields are filled
+    mode: 'onChange', 
   });
 
-  const onSubmit = (data) => {
-    // Simulate form submission and show the popup
-    setPopupVisible(true);
-    setTimeout(() => {
-      setPopupVisible(false);
-      navigate('/dashboard'); // Redirect to the dashboard after 2 seconds
-    }, 2000);
+  const onSubmit = async (data) => {
+    try {
+      console.log("Submit process started!!");
+      const formData = new FormData();
+      formData.append('image', data.image[0]); 
+      // Add community fields to the formData
+      formData.append('title', data.title);
+      formData.append('description', data.description);
+      formData.append('location', data.location);
+      formData.append('ageGroup', data.ageGroup);
+      formData.append('date', data.date);
+      formData.append('time', data.time);
+      formData.append('gender', data.gender);
+      formData.append('members', data.members);
+      formData.append('payment', data.payment);
+
+      const response = await axios.post('http://localhost:5000/api/users/upload', formData); 
+
+      console.log('Image uploaded successfully:', response.data.secure_url);
+      setPopupVisible(true);
+      setTimeout(() => {
+        setPopupVisible(false);
+        navigate('/dashboard'); 
+      }, 2000);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
   };
 
   return (
@@ -74,7 +95,6 @@ const Createcomform = () => {
           )}
         </div>
 
-        {/* Age Group - moved above Date */}
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
@@ -111,7 +131,6 @@ const Createcomform = () => {
           )}
         </div>
 
-        {/* Gender - new field added */}
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
@@ -144,7 +163,6 @@ const Createcomform = () => {
           )}
         </div>
 
-        {/* Paid/Unpaid with gaps */}
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
@@ -159,21 +177,26 @@ const Createcomform = () => {
           )}
         </div>
 
-        {/* Link instead of Button */}
-        <div>
-          {isValid ? (
-            <Link
-              to="/dashboard"
-              className="w-full bg-blue-500 text-white py-3 rounded-lg cursor-pointer hover:bg-blue-600 text-center block"
-              onClick={handleSubmit(onSubmit)}
-            >
-              Submit
-            </Link>
-          ) : (
-            <span className="w-full bg-gray-500 text-white py-3 rounded-lg text-center block cursor-not-allowed">
-              Submit
-            </span>
+        <div className="mb-6">
+          <input
+            type="file"
+            accept="image/*"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            {...register('image', { required: 'Image is required' })}
+          />
+          {errors.image && (
+            <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
           )}
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            className={`w-full bg-blue-500 text-white py-3 rounded-lg cursor-pointer hover:bg-blue-600 text-center block ${!isValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isValid}
+          >
+            Upload
+          </button>
         </div>
       </form>
     </div>

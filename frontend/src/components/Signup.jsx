@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { useForm, Controller } from 'react-hook-form';
-import { fetchCities } from '../geoApi'; // Ensure geoApi.js is created and this path is correct
+// import { fetchCities } from '../geoApi'; // Ensure geoApi.js is created and this path is correct
 import { Link } from 'react-router-dom';
 
 const interestOptions = [
@@ -20,7 +20,8 @@ const Signup = () => {
 
   useEffect(() => {
     const getCities = async () => {
-      const citiesList = await fetchCities();
+      // const citiesList = await fetchCities();
+      const citiesList = ["Mumbai", "Pune"];
       setCities(citiesList);
     };
 

@@ -10,8 +10,7 @@ import ExploreEvents from './components/ExploreEvents'
 import Dashboard from './components/Dashboard'
 import CreatedComm from './components/CreatedComm'
 import Createcomform from './components/Createcomfrom'
-
-// import Signup from './components/Signup'
+import Signup from './components/Signup'
 
 function App() {
   const routerapp = createBrowserRouter([
@@ -50,11 +49,11 @@ function App() {
         {
           path: "/created",
           element: <CreatedComm />
-        }
-        // {
-        //   path:"/signup",
-        //   element:<Signup/>
-        // },
+        },
+        {
+          path:"/signup",
+          element:<Signup/>
+        },
       ],
       errorElement:<Error/>
     }

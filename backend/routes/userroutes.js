@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 const router = express.Router();
 const userController = require('../controllers/usercontrol');
 const jwtMiddleware = require('../middleware/jwt-middleware');
+const { upload } = require('../cloudConfig');
 
 router.post('/signup', [
     body('username').not().isEmpty().withMessage('Username is required.'),
@@ -24,5 +25,7 @@ router.post('/login', [
 ], userController.login);
 
 router.get('/creator', jwtMiddleware, userController.getCreatorView);
+
+router.post('/upload', upload.single('image'), userController.uploadImage);
 
 module.exports = router;
