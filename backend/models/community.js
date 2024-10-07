@@ -33,10 +33,6 @@ const communityschema = new Schema({
         enum: ['Male', 'Female', 'Other', 'All'], 
         required: true
     },
-    image:{
-        type: String,
-        required: true
-    },
     membercount:{
         type: Number,
         required: true
@@ -46,10 +42,14 @@ const communityschema = new Schema({
         enum: ['Paid', 'Unpaid'],
         required: true
     },
-    creator: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-        }, 
+    // creator: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User'
+    //     }, 
+    imageurl: {
+        type: String,
+        required: true
+    },
     members: [{
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User'

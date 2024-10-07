@@ -2,35 +2,39 @@ const Community = require('../models/community');
 const User = require('../models/usermodel');
 const HttpError = require('../models/HttpError');
 const Feedback = require('../models/feedback');
+const { cloudinary } = require('../cloudConfig');
+
+require('dotenv').config();
 
 const createcommunity = async (req, res, next) => {
-  const { title, description, location, agegrp, image, date, time, gender, membercount, creator } = req.body;
+  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, imageurl } = req.body;
 
   const newCommunity = new Community({
     title,
     description,
     location,
     agegrp,
-    image,
     date,
     time,
     gender,
     membercount,
-    creator
+    moneystatus,
+    imageurl,
+    members: [],
   });
 
   try {
     await newCommunity.save();
-    const user = await User.findById(creator);
-    if (!user) {
-      const error = new HttpError(404, 'User not found');
-      return next(error);
-    }
+    // const user = await User.findById(creator);
+    // if (!user) {
+    //   const error = new HttpError(404, 'User not found');
+    //   return next(error);
+    // }
 
-    user.communitiesCreated.push(newCommunity._id);
-    await user.save();
+    // user.communitiesCreated.push(newCommunity._id);
+    // await user.save();
 
-    res.status(201).json({ message: 'Community created!', community: newCommunity });
+    res.status(201).json({ message: 'Community created!'});
   } catch (err) {
     const error = new HttpError(500, 'Creating community failed');
     return next(error);
@@ -275,7 +279,21 @@ const getfeedback = async (req, res, next) => {
   res.status(500).json({ message: "Fetching feedback failed" });
 }};
 
+const uploadImage = async (req, res) => {
+  try {
+      const file = req.file; 
+      if (!file) {
+          return res.status(400).json({ message: 'No file uploaded.' });
+      }
+      const imageUrl = file.path; 
+      console.log(imageUrl);
+      return res.json({
+          message: 'Image uploaded successfully',
+          url: imageUrl,
+      });
+  } catch (error) {
+      return res.status(500).json({ message: 'Error uploading image', error: error.message });
+  }
+};
 
-
-
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback};
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage};

@@ -4,7 +4,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const { cloudinary } = require('../cloudConfig');
+// const { cloudinary } = require('../cloudConfig');
 
 require('dotenv').config();
 
@@ -173,20 +173,20 @@ const getCreatorView = async (req, res, next) => {
     }
 };
 
-const uploadImage = async (req, res) => {
-    try {
-        const file = req.file; 
-        if (!file) {
-            return res.status(400).json({ message: 'No file uploaded.' });
-        }
-        const imageUrl = file.path; 
-        console.log(imageUrl);
-        return res.json({
-            message: 'Image uploaded successfully',
-            url: imageUrl,
-        });
-    } catch (error) {
-        return res.status(500).json({ message: 'Error uploading image', error: error.message });
-    }
-};
-module.exports = { signup, verifyOtp, login, getCreatorView, uploadImage };
+// const uploadImage = async (req, res) => {
+//     try {
+//         const file = req.file; 
+//         if (!file) {
+//             return res.status(400).json({ message: 'No file uploaded.' });
+//         }
+//         const imageUrl = file.path; 
+//         console.log(imageUrl);
+//         return res.json({
+//             message: 'Image uploaded successfully',
+//             url: imageUrl,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ message: 'Error uploading image', error: error.message });
+//     }
+// };
+module.exports = { signup, verifyOtp, login, getCreatorView };
