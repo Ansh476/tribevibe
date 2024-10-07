@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { useForm, Controller } from 'react-hook-form';
-import { CITIESDATA } from '../utils/constants'; 
+// import { CITIESDATA } from '../utils/constants';  // Commenting out the cities data import
 import { useNavigate } from 'react-router-dom';
-import Avatar from 'react-avatar';  
+import Avatar from 'react-avatar';
 
 const interestOptions = [
   { value: 'Sports', label: 'Sports' },
@@ -15,36 +15,36 @@ const interestOptions = [
 
 const Signup = () => {
   const { register, handleSubmit, control, formState: { errors } } = useForm();
-  const [cities, setCities] = useState([]);
-  const [otpSent, setOtpSent] = useState(false);  
-  const [email, setEmail] = useState('');         
-  const [otp, setOtp] = useState('');             
-  const [token, setToken] = useState('');        
+  const [cities, setCities] = useState([]);  // Still keeping the state but not using it
+  const [otpSent, setOtpSent] = useState(false);
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [token, setToken] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getCities = () => {
-      const formattedCities = CITIESDATA.map(state => 
-        state.cities.map(city => ({
-          label: `${city.name}, ${state.name}`,
-          value: city.name
-        }))
-      ).flat();
-      setCities(formattedCities);
-    };
-    
-    getCities();
+    // const getCities = () => {
+    //   const formattedCities = CITIESDATA.map(state => 
+    //     state.cities.map(city => ({
+    //       label: `${city.name}, ${state.name}`,
+    //       value: city.name
+    //     }))
+    //   ).flat();
+    //   setCities(formattedCities);
+    // };
+
+    // getCities();
   }, []);
 
   const onSubmit = async (data) => {
-    const avatar = data.fullName.charAt(0).toUpperCase();  
+    const avatar = data.fullName.charAt(0).toUpperCase();
 
     const formData = {
       username: data.username,
       email: data.email,
       password: data.password,
       fullName: data.fullName,
-      profilepic: avatar,  
+      profilepic: avatar,
       location: data.location ? data.location.value : '',
       interests: JSON.stringify(data.interests.map(i => i.value)),
     };
@@ -52,9 +52,9 @@ const Signup = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/users/signup', formData);
       alert('Signup successful! OTP sent to your email.');
-      setEmail(data.email);  
-      setToken(response.data.token);  
-      setOtpSent(true);  
+      setEmail(data.email);
+      setToken(response.data.token);
+      setOtpSent(true);
     } catch (error) {
       alert('Signup failed. Please try again.');
     }
@@ -65,7 +65,7 @@ const Signup = () => {
       const response = await axios.post('http://localhost:5000/api/users/verify-otp', { email, otp });
       alert('OTP verified! Logging you in...');
       localStorage.setItem('token', token);
-      navigate('/'); 
+      navigate('/');
     } catch (error) {
       alert('OTP verification failed. Please try again.');
     }
@@ -74,7 +74,7 @@ const Signup = () => {
   return (
     <div className="max-w-lg mx-auto p-8 bg-white rounded-lg shadow-lg mt-20">
       <h1 className="text-3xl font-bold mb-6 text-center">Welcome to Tribevibe, Signup</h1>
-      
+
       {!otpSent ? (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="form-group">
@@ -90,7 +90,7 @@ const Signup = () => {
             <label className="block text-gray-700 font-bold mb-2">Email Address</label>
             <input
               type="email"
-              {...register('email', { 
+              {...register('email', {
                 required: 'Email is required',
                 pattern: {
                   value: /^\S+@\S+$/i,
@@ -119,7 +119,7 @@ const Signup = () => {
             />
             {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
           </div>
-          
+
           <div className="form-group">
             <label className="block text-gray-700 font-bold mb-2">Avatar Preview</label>
             <Avatar name={register('fullName').value} size="50" round={true} /> {/* Display Avatar */}
@@ -133,13 +133,17 @@ const Signup = () => {
               render={({ field }) => (
                 <Select
                   {...field}
-                  options={cities}
+                  options={[
+                    { value: 'mumbai', label: 'Mumbai' },
+                    { value: 'delhi', label: 'Delhi' }
+                  ]}  // Corrected format
                   className="w-full"
                   classNamePrefix="select"
                 />
               )}
             />
           </div>
+
           <div className="form-group">
             <label className="block text-gray-700 font-bold mb-2">Interests</label>
             <Controller

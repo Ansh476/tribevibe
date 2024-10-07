@@ -9,7 +9,7 @@ import Login from './components/Login'
 import ExploreEvents from './components/ExploreEvents'
 import Dashboard from './components/Dashboard'
 import Createcomform from './components/Createcomfrom'
-// import Signup from './components/Signup'
+import Signup from './components/Signup'
 import { AuthProvider } from './components/authentication/Authcontext'
 
 function App() {
@@ -45,11 +45,11 @@ function App() {
         {
           path: "/communityform",   
           element: <Createcomform />
-        }
-        // {
-        //   path:"/signup",
-        //   element:<Signup/>
-        // },
+        },
+        {
+          path:"/signup",
+          element:<Signup/>
+        },
       ],
       errorElement:<Error/>
     }

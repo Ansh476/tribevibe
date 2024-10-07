@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 // import Navbar from '../components/Header';
 import { AuthContext } from '../components/authentication/Authcontext';
+import { useContext } from 'react';
 
 
 const Layout = () => {

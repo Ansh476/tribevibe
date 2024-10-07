@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import comimg from "../assets/createcomimg.png";
-import { AuthContext } from '../context/AuthContext'; 
+import { AuthContext } from './authentication/Authcontext';
 
 const Creatingcom = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
-import { AuthContext } from '../AuthContext';
+import { AuthContext } from './authentication/Authcontext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 

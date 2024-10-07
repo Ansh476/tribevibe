@@ -1,46 +1,50 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Createcomform = () => {
   const [popupVisible, setPopupVisible] = useState(false);
-  const navigate = useNavigate(); // for navigation
+  const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm({
-    mode: 'onChange', 
-  });
+  const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
 
   const onSubmit = async (data) => {
     try {
-      console.log("Submit process started!!");
+      console.log('Submit process started!!');
+      
       const formData = new FormData();
-      formData.append('image', data.image[0]); 
-      // Add community fields to the formData
-      formData.append('title', data.title);
-      formData.append('description', data.description);
-      formData.append('location', data.location);
-      formData.append('ageGroup', data.ageGroup);
-      formData.append('date', data.date);
-      formData.append('time', data.time);
-      formData.append('gender', data.gender);
-      formData.append('members', data.members);
-      formData.append('payment', data.payment);
+      formData.append('image', data.image[0]);
 
-      const response = await axios.post('http://localhost:5000/api/users/upload', formData); 
+      // Upload image to server
+      const response = await axios.post('http://localhost:5000/api/community/upload', formData);
+      const imageUrl = response.data.secure_url;
 
-      console.log('Image uploaded successfully:', response.data.secure_url);
+      const completeFormData = {
+        title: data.title,
+        description: data.description,
+        location: data.location,
+        agegrp: data.ageGroup,
+        date: data.date,
+        time: data.time,
+        gender: data.gender,
+        membercount: data.members,
+        moneystatus: data.payment,
+        imageurl: String(imageUrl),
+      };
+
+      console.log(completeFormData);
+      await axios.post('http://localhost:5000/api/community/create', completeFormData);
+
       setPopupVisible(true);
       setTimeout(() => {
         setPopupVisible(false);
-        navigate('/dashboard'); 
+        navigate('/dashboard');
       }, 2000);
+
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error during submission:', error);
+      alert('There was an error uploading the form.');
     }
   };
 
@@ -54,12 +58,10 @@ const Createcomform = () => {
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Your Community!</h2>
 
+        {/* Title */}
         <div className="mb-6">
           <input
             type="text"
@@ -67,22 +69,20 @@ const Createcomform = () => {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('title', { required: 'Title is required' })}
           />
-          {errors.title && (
-            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-          )}
+          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
+        {/* Description */}
         <div className="mb-6">
           <textarea
             placeholder="Description"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('description', { required: 'Description is required' })}
           />
-          {errors.description && (
-            <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
-          )}
+          {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
 
+        {/* Location */}
         <div className="mb-6">
           <input
             type="text"
@@ -90,11 +90,10 @@ const Createcomform = () => {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('location', { required: 'Location is required' })}
           />
-          {errors.location && (
-            <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>
-          )}
+          {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>}
         </div>
 
+        {/* Age Group */}
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
@@ -104,33 +103,30 @@ const Createcomform = () => {
               <input type="radio" value="Open for All" {...register('ageGroup', { required: 'Select Age Group' })} /> Open for All
             </label>
           </div>
-          {errors.ageGroup && (
-            <p className="text-red-500 text-sm mt-1">{errors.ageGroup.message}</p>
-          )}
+          {errors.ageGroup && <p className="text-red-500 text-sm mt-1">{errors.ageGroup.message}</p>}
         </div>
 
+        {/* Date */}
         <div className="mb-6">
           <input
             type="date"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('date', { required: 'Date is required' })}
           />
-          {errors.date && (
-            <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>
-          )}
+          {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>}
         </div>
 
+        {/* Time */}
         <div className="mb-6">
           <input
             type="time"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('time', { required: 'Time is required' })}
           />
-          {errors.time && (
-            <p className="text-red-500 text-sm mt-1">{errors.time.message}</p>
-          )}
+          {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time.message}</p>}
         </div>
 
+        {/* Gender */}
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
@@ -146,11 +142,10 @@ const Createcomform = () => {
               <input type="radio" value="All" {...register('gender', { required: 'Select Gender' })} /> All
             </label>
           </div>
-          {errors.gender && (
-            <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
-          )}
+          {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>}
         </div>
 
+        {/* Members Count */}
         <div className="mb-6">
           <input
             type="number"
@@ -158,11 +153,10 @@ const Createcomform = () => {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('members', { required: 'Number of members is required' })}
           />
-          {errors.members && (
-            <p className="text-red-500 text-sm mt-1">{errors.members.message}</p>
-          )}
+          {errors.members && <p className="text-red-500 text-sm mt-1">{errors.members.message}</p>}
         </div>
 
+        {/* Payment Status */}
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
@@ -172,11 +166,10 @@ const Createcomform = () => {
               <input type="radio" value="Unpaid" {...register('payment', { required: 'Select Paid or Unpaid' })} /> Unpaid
             </label>
           </div>
-          {errors.payment && (
-            <p className="text-red-500 text-sm mt-1">{errors.payment.message}</p>
-          )}
+          {errors.payment && <p className="text-red-500 text-sm mt-1">{errors.payment.message}</p>}
         </div>
 
+        {/* Image Upload */}
         <div className="mb-6">
           <input
             type="file"
@@ -184,18 +177,17 @@ const Createcomform = () => {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('image', { required: 'Image is required' })}
           />
-          {errors.image && (
-            <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
-          )}
+          {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
         </div>
 
+        {/* Submit Button */}
         <div>
           <button
             type="submit"
             className={`w-full bg-blue-500 text-white py-3 rounded-lg cursor-pointer hover:bg-blue-600 text-center block ${!isValid ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!isValid}
           >
-            Upload
+            Create Community
           </button>
         </div>
       </form>
