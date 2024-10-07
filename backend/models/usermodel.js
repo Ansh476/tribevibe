@@ -48,7 +48,7 @@ const UserSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Community'
     }],
-});
+}); 
 
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {

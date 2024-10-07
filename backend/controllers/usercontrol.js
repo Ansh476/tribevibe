@@ -116,7 +116,7 @@ const login = async (req, res, next) => {
         const error = new HttpError('Invalid inputs, please check your data.', 422);
         return next(error);
     }
-
+ 
     const { email, password } = req.body;
     let existingUser;
     try {
