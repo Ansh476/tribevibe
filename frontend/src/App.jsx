@@ -8,9 +8,9 @@ import Error from './components/Error'
 import Login from './components/Login'
 import ExploreEvents from './components/ExploreEvents'
 import Dashboard from './components/Dashboard'
-import CreatedComm from './components/CreatedComm'
 import Createcomform from './components/Createcomfrom'
-import Signup from './components/Signup'
+// import Signup from './components/Signup'
+import { AuthProvider } from './components/authentication/Authcontext'
 
 function App() {
   const routerapp = createBrowserRouter([
@@ -45,24 +45,20 @@ function App() {
         {
           path: "/communityform",   
           element: <Createcomform />
-        },
-        {
-          path: "/created",
-          element: <CreatedComm />
-        },
-        {
-          path:"/signup",
-          element:<Signup/>
-        },
+        }
+        // {
+        //   path:"/signup",
+        //   element:<Signup/>
+        // },
       ],
       errorElement:<Error/>
     }
   ])
 
   return (
-    <>
-    <RouterProvider router={routerapp}></RouterProvider>
-    </>
+    <AuthProvider>
+      <RouterProvider router={routerapp} />
+    </AuthProvider>
   )
 }
 
