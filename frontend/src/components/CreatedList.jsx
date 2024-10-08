@@ -10,7 +10,7 @@ const CreatedList = () => {
 
     useEffect(() => {
         const fetchEvents = async () => {
-            try {
+            try { 
                 const response = await axios.get(`http://localhost:5000/api/community/created/${userId}`);
                 setEvents(response.data); 
             } catch (error) {
