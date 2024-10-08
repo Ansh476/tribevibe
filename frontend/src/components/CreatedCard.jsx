@@ -4,7 +4,7 @@ const CreatedCard = ({ event }) => {
   return (
     <div className="flex-row p-[24px] justify-center items-start gap-[36px] rounded-[30px] bg-[#FFF7FE] shadow-lg">
       <img 
-        src={event.image} 
+        src={event.imageurl} 
         alt={event.title} 
         className="w-[283.811px] h-[258.419px] object-cover rounded-lg flex-shrink-0" 
       />

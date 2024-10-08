@@ -23,4 +23,5 @@ router.post('/:communityid/feedback', commcontroller.postfeedback)
 
 router.post('/:communityid/feedback', commcontroller.getfeedback)
 router.post('/upload', upload.single('image'), commcontroller.uploadImage);
+router.get('/created/:userId', commcontroller.getCommunitiesByUserId);
 module.exports = router;
