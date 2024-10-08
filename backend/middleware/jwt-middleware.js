@@ -9,7 +9,7 @@ const jwtMiddleware = (req, res, next) => {
     }
 
     try {
-        const decodedToken = jwt.verify(token, process.env.mahvish); 
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET); 
         req.user = { id: decodedToken.userId }; 
         next(); 
     } catch (err) {

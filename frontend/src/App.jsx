@@ -11,6 +11,7 @@ import Dashboard from './components/Dashboard'
 import Createcomform from './components/Createcomfrom'
 import Signup from './components/Signup'
 import CreatedComm from './components/CreatedComm'
+import JoinedComm from './components/JoinedComm'
 import { AuthProvider } from './components/authentication/Authcontext'
 
 function App() {
@@ -54,6 +55,10 @@ function App() {
         {
           path:"/created",
           element:<CreatedComm/>
+        },
+        {
+          path:"/joinedcom",
+          element:<JoinedComm />
         },
       ],
       errorElement:<Error/>

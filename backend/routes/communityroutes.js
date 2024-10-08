@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { upload } = require('../cloudConfig');
-
+const jwtMiddleware = require('../middleware/jwt-middleware');
 const commcontroller = require('../controllers/commcontrol');
 
 router.get('/', commcontroller.getallComm);
 
 router.post('/create', commcontroller.createcommunity);
-router.post('/:communityId/join', commcontroller.joinCommunity);
+router.post('/:communityId/join', jwtMiddleware, commcontroller.joinCommunity);
 router.get('/:communityId', commcontroller.getCommDetails);
 router.patch('/:communityId', commcontroller.updateComm);
 router.delete('/:communityId', commcontroller.deleteComm);

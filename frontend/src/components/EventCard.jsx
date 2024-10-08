@@ -1,6 +1,24 @@
 import React from 'react';
+import axios from 'axios';
 
 const EventCard = ({ event }) => {
+  const handleJoin = async () => {
+    try {
+        
+        const token = localStorage.getItem('token'); 
+
+        const response = await axios.post(`http://localhost:5000/api/community/${event._id}/join`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`, 
+            },
+        });
+
+        alert(response.data.message);
+    } catch (error) {
+        alert(error.response?.data?.message || 'Failed to join community'); 
+    }
+};
+
   return (
     <div className="flex-row p-[24px] justify-center items-start gap-[36px] rounded-[30px] bg-gradient-to-b from-[#E6BFE0] to-[#61355A] shadow-md">
       <img 
@@ -18,6 +36,7 @@ const EventCard = ({ event }) => {
       </button>
       <button 
         className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-gradient-to-b from-[#E6BFE0] to-[#61355A] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] ml-8"
+        onClick={handleJoin}
       >
         Join
       </button>

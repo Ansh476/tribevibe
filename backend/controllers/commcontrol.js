@@ -7,7 +7,7 @@ const { cloudinary } = require('../cloudConfig');
 require('dotenv').config();
 
 const createcommunity = async (req, res, next) => {
-  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, creator, imageurl } = req.body;
+  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, approval, creator, imageurl } = req.body;
 
   const newCommunity = new Community({
     title,
@@ -19,21 +19,23 @@ const createcommunity = async (req, res, next) => {
     gender,
     membercount,
     moneystatus,
+    approval,
     imageurl,
     creator,
     members: [],
+    joinRequests: approval === 'Approved Only' ? [] : undefined, 
   });
 
   try {
     await newCommunity.save();
-    // const user = await User.findById(creator);
-    // if (!user) {
-    //   const error = new HttpError(404, 'User not found');
-    //   return next(error);
-    // }
+    const user = await User.findById(creator);
+    if (!user) {
+      const error = new HttpError(404, 'User not found');
+      return next(error);
+    }
 
-    // user.communitiesCreated.push(newCommunity._id);
-    // await user.save();
+    user.communitiesCreated.push(newCommunity._id);
+    await user.save();
 
     res.status(201).json({ message: 'Community created!'});
   } catch (err) {
@@ -44,38 +46,44 @@ const createcommunity = async (req, res, next) => {
 
 const joinCommunity = async (req, res, next) => {
   const { communityId } = req.params;
-  const userId = req.user.id; //  authentication middleware (JWT) for req.user
+  const userId = req.user.id;
 
   try {
     const community = await Community.findById(communityId);
     if (!community) {
-      const error = new HttpError(404, 'Community not found.');
-      return next(error);
+      return next(new HttpError(404, 'Community not found.'));
     }
 
-    if (community.members.includes(userId)) {
-      const error = new HttpError(400, 'User already joined.');
-      return next(error);
-    }
-
-    community.members.push(userId);
-    await community.save();
-
-    const user = await User.findById(userId);
+    const user = await User.findById(userId); 
     if (!user) {
-      const error = new HttpError(404, 'User not found.');
-      return next(error);
+      return next(new HttpError(404, 'User not found.'));
     }
 
-    user.communitiesJoined.push(communityId);
-    await user.save();
+    if (community.approval === 'Open Community') {
+      if (community.members.includes(userId)) {
+        return next(new HttpError(400, 'User already joined.'));
+      }
 
-    res.status(200).json({ message: 'Joined community!', community });
+      community.members.push(userId);
+      user.communitiesJoined.push(communityId); 
+      await Promise.all([community.save(), user.save()]); 
+      return res.status(200).json({ message: 'Joined community!', community });
+    } else {
+      const existingRequest = community.joinRequests.find(req => req.userId.equals(userId));
+      if (existingRequest) {
+        return next(new HttpError(400, 'Join request already submitted.'));
+      }
+
+      community.joinRequests.push(userId ); 
+      // user.communitiesJoined.push(communityId);
+      await community.save(); 
+      return res.status(200).json({ message: 'Join request submitted!', community });
+    }
   } catch (err) {
-    const error = new HttpError(500, 'Joining community failed.');
-    return next(error);
+    return next(new HttpError(500, 'Joining community failed.'));
   }
 };
+
 
 const getallComm = async (req, res, next) => {
   try {
@@ -182,7 +190,7 @@ function asyncWrap(fn){
 }
 
 const postannouncement = asyncWrap(async (req, res, next) => {
-  const creatorId = req.user.id; // authentication middleware jwt req.user
+  const creatorId = req.user.id; 
   const { message, imgfile } = req.body;
   const { communityId } = req.params; 
 

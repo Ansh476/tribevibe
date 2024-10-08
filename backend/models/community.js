@@ -42,6 +42,11 @@ const communityschema = new Schema({
         enum: ['Paid', 'Unpaid'],
         required: true
     },
+    approval: {
+        type: String,
+        enum: ['Open Community', 'Approved Only'],
+        required: true
+    },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -53,6 +58,11 @@ const communityschema = new Schema({
     members: [{
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User'
+    }],
+    joinRequests: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+        required: false
     }]
 });
 

@@ -30,6 +30,7 @@ const CreateComForm = () => {
         gender: data.gender,
         membercount: data.members,
         moneystatus: data.payment,
+        approval: data.approval,
         imageurl: String(imageUrl),
         creator: userId, 
       };
@@ -176,6 +177,18 @@ const CreateComForm = () => {
             </label>
           </div>
           {errors.payment && <p className="text-red-500 text-sm mt-1">{errors.payment.message}</p>}
+        </div>
+
+        <div className="mb-6">
+          <div className="mt-2">
+            <label className="mr-4">
+              <input type="radio" value="Open Community" {...register('approval', { required: 'Community Type' })} /> Open Community
+            </label>
+            <label className="mr-4">
+              <input type="radio" value="Approved Only" {...register('approval', { required: 'Community Type' })} /> Approved Only
+            </label>
+          </div>
+          {errors.approval && <p className="text-red-500 text-sm mt-1">{errors.approval.message}</p>}
         </div>
 
         {/* Image Upload */}
