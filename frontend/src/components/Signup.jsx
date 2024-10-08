@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { useForm, Controller } from 'react-hook-form';
-// import { CITIESDATA } from '../utils/constants';  // Commenting out the cities data import
+// import { CITIESDATA } from '../utils/constants';  
 import { useNavigate } from 'react-router-dom';
 import Avatar from 'react-avatar';
 
@@ -15,7 +15,7 @@ const interestOptions = [
 
 const Signup = () => {
   const { register, handleSubmit, control, formState: { errors } } = useForm();
-  const [cities, setCities] = useState([]);  // Still keeping the state but not using it
+  const [cities, setCities] = useState([]);  
   const [otpSent, setOtpSent] = useState(false);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -37,16 +37,14 @@ const Signup = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    const avatar = data.fullName.charAt(0).toUpperCase();
 
     const formData = {
       username: data.username,
       email: data.email,
       password: data.password,
-      fullName: data.fullName,
-      profilepic: avatar,
+      fullname: data.fullName,
+      Phone: data.phone,  
       location: data.location ? data.location.value : '',
-      interests: JSON.stringify(data.interests.map(i => i.value)),
     };
 
     try {
@@ -121,8 +119,13 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label className="block text-gray-700 font-bold mb-2">Avatar Preview</label>
-            <Avatar name={register('fullName').value} size="50" round={true} /> {/* Display Avatar */}
+            <label className="block text-gray-700 font-bold mb-2">Phone Number</label>
+            <input
+              type="text"
+              {...register('phone', { required: 'Phone number is required' })}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+            {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
           </div>
 
           <div className="form-group">

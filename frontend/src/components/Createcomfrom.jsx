@@ -18,8 +18,7 @@ const Createcomform = () => {
 
       // Upload image to server
       const response = await axios.post('http://localhost:5000/api/community/upload', formData);
-      const imageUrl = response.data.secure_url;
-
+      const imageUrl = response.data.url;
       const completeFormData = {
         title: data.title,
         description: data.description,
@@ -97,7 +96,7 @@ const Createcomform = () => {
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
-              <input type="radio" value=">18" {...register('ageGroup', { required: 'Select Age Group' })} /> Above 18
+              <input type="radio" value="Above 18" {...register('ageGroup', { required: 'Select Age Group' })} /> Above 18
             </label>
             <label>
               <input type="radio" value="Open for All" {...register('ageGroup', { required: 'Select Age Group' })} /> Open for All

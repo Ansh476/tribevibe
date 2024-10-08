@@ -48,7 +48,7 @@ const communityschema = new Schema({
     //     }, 
     imageurl: {
         type: String,
-        required: true
+        required: false
     },
     members: [{
         type: mongoose.Schema.Types.ObjectId, 

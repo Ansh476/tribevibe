@@ -131,9 +131,9 @@ const login = async (req, res, next) => {
         return res.status(401).json({ message: error.message });
     }
 
-    if (!existingUser.isVerified) {
-        return res.status(403).json({ message: 'Email not verified.' });
-    }
+    // if (!existingUser.isVerified) {
+    //     return res.status(403).json({ message: 'Email not verified.' });
+    // }
 
     const isPasswordValid = await bcrypt.compare(password, existingUser.password);
     if (!isPasswordValid) {
