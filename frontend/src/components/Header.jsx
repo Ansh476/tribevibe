@@ -1,16 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Logo from "../assets/tribevibelogo.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; 
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
 import { Link as ScrollLink } from "react-scroll";
 import ResponsiveNavbar from "./ResponsiveNavbar";
+import { AuthContext } from "./authentication/Authcontext"; 
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isLoggedIn, logout } = useContext(AuthContext); 
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
+  };
+
+  const handleLogout = () => {
+    logout(); 
+    navigate("/"); 
   };
 
   return (
@@ -75,14 +83,31 @@ const Header = () => {
               )}
             </div>
 
-            <div className="hidden md:flex justify-end" onClick={() => window.scrollTo(0, 0)}>
-              <Link to="/login" className="cursor-pointer pr-5">
-                Login
-              </Link>
-              {/* <Link to="/signup" className="cursor-pointer pr-5">
-                Sign Up
-              </Link> */}
+            <div className="hidden md:flex justify-end items-center gap-4">
+              {isLoggedIn ? ( 
+                <>
+                  <Link to="/joinedcom" className="cursor-pointer pr-5">
+                    Joined Communities
+                  </Link>
+                  <Link to="/created" className="cursor-pointer pr-5">
+                    Created Communities
+                  </Link>
+                  <button onClick={handleLogout} className="cursor-pointer pr-5">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <> 
+                  <Link to="/login" className="cursor-pointer pr-5">
+                    Login
+                  </Link>
+                  <Link to="/signup" className="cursor-pointer pr-5">
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
+
             <div className="md:hidden block">
               {showMenu ? (
                 <HiMenuAlt1 onClick={toggleMenu} className="cursor-pointer transition-all" size={30} />

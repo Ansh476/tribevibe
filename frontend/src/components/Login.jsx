@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { AuthContext } from './authentication/Authcontext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
- 
+
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const { login } = useContext(AuthContext);
@@ -12,15 +12,14 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post('http://localhost:5000/api/users/login', {
-        email: data.input, // phone, username, email
+        email: data.input,
         password: data.password
       });
-  
-      const result = response.data;
-  
-      console.log(result);
-      login();
-      navigate('/dashboard');
+
+      console.log('Login Response:', response.data);
+      const { token, userId } = response.data; 
+      login(userId, token); 
+      navigate('/dashboard'); 
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
       alert(errorMessage);

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from "./authentication/Authcontext"; 
 
-const Createcomform = () => {
+const CreateComForm = () => {
+  const { userId: contextUserId } = useContext(AuthContext); 
+  const [userId, setUserId] = useState(contextUserId || localStorage.getItem('userId'));
   const [popupVisible, setPopupVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -11,12 +14,10 @@ const Createcomform = () => {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Submit process started!!');
-      
+
       const formData = new FormData();
       formData.append('image', data.image[0]);
 
-      // Upload image to server
       const response = await axios.post('http://localhost:5000/api/community/upload', formData);
       const imageUrl = response.data.url;
       const completeFormData = {
@@ -30,6 +31,7 @@ const Createcomform = () => {
         membercount: data.members,
         moneystatus: data.payment,
         imageurl: String(imageUrl),
+        creator: userId, 
       };
 
       console.log(completeFormData);
@@ -46,6 +48,14 @@ const Createcomform = () => {
       alert('There was an error uploading the form.');
     }
   };
+
+  // Handle case when userId changes in AuthContext
+  useEffect(() => {
+    if (contextUserId) {
+      setUserId(contextUserId);
+      localStorage.setItem('userId', contextUserId); // Sync with local storage
+    }
+  }, [contextUserId]);
 
   return (
     <div className="h-auto bg-gradient-to-r from-primary to-secondary flex items-center justify-center py-10 mt-10">
@@ -194,4 +204,4 @@ const Createcomform = () => {
   );
 };
 
-export default Createcomform;
+export default CreateComForm;

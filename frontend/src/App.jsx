@@ -10,6 +10,7 @@ import ExploreEvents from './components/ExploreEvents'
 import Dashboard from './components/Dashboard'
 import Createcomform from './components/Createcomfrom'
 import Signup from './components/Signup'
+import CreatedComm from './components/CreatedComm'
 import { AuthProvider } from './components/authentication/Authcontext'
 
 function App() {
@@ -49,6 +50,10 @@ function App() {
         {
           path:"/signup",
           element:<Signup/>
+        },
+        {
+          path:"/created",
+          element:<CreatedComm/>
         },
       ],
       errorElement:<Error/>

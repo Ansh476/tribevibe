@@ -11,7 +11,7 @@ const Dashboard = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://localhost:5000/api/communities/');
+            const response = await axios.get('http://localhost:5000/api/community');
             const communities = response.data.communities; 
             setEvents(communities); 
             setFilteredEvents(communities); 
@@ -69,7 +69,7 @@ const Dashboard = () => {
                 <div className='ml-auto cursor-pointer' onClick={handleSearch}>
                     <IoSearch 
                         size={24} 
-                        className={`bg-[#d9d9d9] text-[#BE07A2] text-2xl h-[60px] w-[62px] rounded-full p-3 transition-transform duration-200 ${isClicked ? 'transform scale-95' : ''}`} 
+                        className={"bg-[#d9d9d9] text-[#BE07A2] text-2xl h-[60px] w-[62px] rounded-full p-3 transition-transform duration-200 ${isClicked ? 'transform scale-95' : '' "}
                     />
                 </div>
             </div>
