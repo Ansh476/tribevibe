@@ -7,7 +7,7 @@ const { cloudinary } = require('../cloudConfig');
 require('dotenv').config();
 
 const createcommunity = async (req, res, next) => {
-  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, imageurl } = req.body;
+  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, creator, imageurl } = req.body;
 
   const newCommunity = new Community({
     title,
@@ -20,6 +20,7 @@ const createcommunity = async (req, res, next) => {
     membercount,
     moneystatus,
     imageurl,
+    creator,
     members: [],
   });
 
@@ -78,7 +79,7 @@ const joinCommunity = async (req, res, next) => {
 
 const getallComm = async (req, res, next) => {
   try {
-    const communities = await Community.find({}, 'title image');
+    const communities = await Community.find({}, 'title imageurl');
     res.status(200).json({ communities });
   } catch (err) {
     const error = new HttpError(500, 'Fetching communities failed.');

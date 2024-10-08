@@ -42,10 +42,10 @@ const communityschema = new Schema({
         enum: ['Paid', 'Unpaid'],
         required: true
     },
-    // creator: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User'
-    //     }, 
+    creator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+        }, 
     imageurl: {
         type: String,
         required: false
