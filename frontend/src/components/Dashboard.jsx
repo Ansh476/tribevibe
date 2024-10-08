@@ -11,7 +11,7 @@ const Dashboard = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://localhost:5000/api/communities/');
+            const response = await axios.get('http://localhost:5000/api/community');
             const communities = response.data.communities; 
             setEvents(communities); 
             setFilteredEvents(communities); 
