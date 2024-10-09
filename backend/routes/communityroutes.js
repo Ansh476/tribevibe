@@ -26,4 +26,6 @@ router.get('/:communityid/feedback', commcontroller.getfeedback)
 router.post('/upload', upload.single('image'), commcontroller.uploadImage);
 router.get('/created/:userId', commcontroller.getCommunitiesByUserId);
 router.get('/joined/:userId', commcontroller.joinedByUserId);
+router.get('/:communityId/tags', commcontroller.getCommunitiesByTags); 
+
 module.exports = router;
