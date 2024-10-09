@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios'; 
+import axios from 'axios';
 import Insights from './Insights';
 import ManageMembers from './ManageMembers';
 import MakeAnnouncements from './MakeAnnouncements';
 import EditDetails from './EditDetails';
 import ModerationTools from './ModerationTools';
-import Feedback from './Feedback'; 
+import Feedback from './Feedback';
 
 const ManageCom = () => {
-  const { communityId } = useParams(); 
+  const { communityId } = useParams();
   const [community, setCommunity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,7 +42,7 @@ const ManageCom = () => {
   const renderComponent = () => {
     switch (activeComponent) {
       case 'Insights':
-        return <Insights community={community} />; 
+        return <Insights community={community} />;
       case 'ManageMembers':
         return <ManageMembers community={community} />;
       case 'MakeAnnouncement':
@@ -86,10 +86,11 @@ const ManageCom = () => {
 
       {/* Main Content */}
       <div className="absolute top-[65px] left-[313px] shadow-[0px_4px_4px_rgba(0,_0,_0,_0.25)] rounded-[10px] bg-gray w-full md:w-[1114px] h-auto md:h-[719px] overflow-hidden p-4">
-        <div className="absolute top-[7px] left-[30px]">
+        <div className="absolute top-[7px] left-[30px] h-full w-full overflow-y-auto pb-[100px]">
           {renderComponent()}
         </div>
       </div>
+
 
       <div className="absolute top-[0px] left-[calc(50%_-_720px)] shadow-[0px_4px_4px_rgba(0,_0,_0,_0.25)] bg-aliceblue w-full md:w-[1440px] h-[50px] overflow-hidden text-right text-xl text-darkmagenta">
         {/* Header content here */}

@@ -10,7 +10,7 @@ router.post('/create', commcontroller.createcommunity);
 router.post('/:communityId/join', jwtMiddleware, commcontroller.joinCommunity);
 router.post('/:communityId/exitcomm', jwtMiddleware, commcontroller.exitCommunity);
 router.get('/:communityId', commcontroller.getCommDetails);
-router.patch('/:communityId', commcontroller.updateComm);
+router.put('/:communityId', commcontroller.updateComm);
 router.delete('/:communityId', commcontroller.deleteComm);
 router.get('/users/:userId', commcontroller.getCreatorcomm);
 

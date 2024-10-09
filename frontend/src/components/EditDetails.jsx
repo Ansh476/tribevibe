@@ -3,9 +3,10 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from "./authentication/Authcontext"; 
+// import Community from '../../../backend/models/community';
 
-const EditDetails = () => {
-  const { id } = useParams(); // Assume you're getting the ID from the URL
+const EditDetails = ({ community }) => {
+  
   const { userId: contextUserId } = useContext(AuthContext);
   const [userId, setUserId] = useState(contextUserId || localStorage.getItem('userId'));
   const [popupVisible, setPopupVisible] = useState(false);
@@ -13,33 +14,40 @@ const EditDetails = () => {
   
   const { register, handleSubmit, setValue, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
 
-  // Fetch existing data
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // Format as yyyy-MM-dd
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/community/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/community/${community._id}`);
         const data = response.data;
 
-        // Set form values with fetched data
-        setValue('title', data.title);
-        setValue('description', data.description);
-        setValue('location', data.location);
-        setValue('ageGroup', data.agegrp);
-        setValue('date', data.date);
-        setValue('time', data.time);
-        setValue('gender', data.gender);
-        setValue('members', data.membercount);
-        setValue('payment', data.moneystatus);
-        // Assume tags is a string, split it into an array
-        setValue('tags', data.tags.join(', '));
+        setValue('title', community.title);
+        setValue('description', community.description);
+        setValue('location', community.location);
+        setValue('ageGroup', community.agegrp);
+        setValue('date', formatDate(community.date));
+        setValue('time', community.time);
+        setValue('gender', community.gender);
+        setValue('members', community.membercount);
+        setValue('payment', community.moneystatus);
+        setValue('approval', community.approval);
+        setValue('tags', community.tags.length > 0 ? community.tags.join(', ') : ''); 
+
       } catch (error) {
         console.error('Error fetching data:', error);
-        alert('There was an error fetching the data.');
+        // alert('There was an error fetching the data.');
       }
     };
 
     fetchData();
-  }, [id, setValue]);
+  }, [community._id, setValue]);
 
   const onSubmit = async (data) => {
     try {
@@ -48,21 +56,24 @@ const EditDetails = () => {
         description: data.description,
         location: data.location,
         agegrp: data.ageGroup,
-        date: data.date,
+        date: community.date,
         time: data.time,
         gender: data.gender,
         membercount: data.members,
         moneystatus: data.payment,
-        tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''), // Handle tags
-        creator: userId,
+        approval: data.approval,
+        tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''), 
+        members: community.members,
+        creator: community.creator._id,
+        imageurl: community.imageurl,
       };
 
-      await axios.put(`http://localhost:5000/api/community/edit/${id}`, completeFormData);
+     await axios.put(`http://localhost:5000/api/community/${community._id}`, completeFormData);
 
       setPopupVisible(true);
       setTimeout(() => {
         setPopupVisible(false);
-        navigate('/dashboard');
+        navigate('/created');
       }, 2000);
 
     } catch (error) {
@@ -201,6 +212,18 @@ const EditDetails = () => {
             </label>
           </div>
           {errors.payment && <p className="text-red-500 text-sm mt-1">{errors.payment.message}</p>}
+        </div>
+
+        <div className="mb-6">
+          <div className="mt-2">
+            <label className="mr-4">
+              <input type="radio" value="Open Community" {...register('approval', { required: 'Community Type' })} /> Open Community
+            </label>
+            <label className="mr-4">
+              <input type="radio" value="Approved Only" {...register('approval', { required: 'Community Type' })} /> Approved Only
+            </label>
+          </div>
+          {errors.approval && <p className="text-red-500 text-sm mt-1">{errors.approval.message}</p>}
         </div>
 
         {/* Image Upload */}

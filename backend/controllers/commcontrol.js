@@ -8,7 +8,6 @@ require('dotenv').config();
 
 const createcommunity = async (req, res, next) => {
   const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, approval, creator, imageurl,tags } = req.body;
-  console.log(req.body);
 
   const newCommunity = new Community({
     title,
@@ -295,7 +294,6 @@ const uploadImage = async (req, res) => {
           return res.status(400).json({ message: 'No file uploaded.' });
       }
       const imageUrl = file.path; 
-      console.log(imageUrl);
       return res.json({
           message: 'Image uploaded successfully',
           url: imageUrl,
@@ -343,8 +341,6 @@ const joinedByUserId = async (req, res) => {
 };
 
 const postfeedback = asyncWrap(async (req, res, next) => {
-  console.log("Request Body:", req.body);
-  console.log("Request Params:", req.params);
 
   const { feedbackmsg, rating } = req.body;
   const communityId = req.params.communityid; // ensure casing matches

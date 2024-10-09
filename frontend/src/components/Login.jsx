@@ -16,7 +16,6 @@ const Login = () => {
         password: data.password
       });
 
-      console.log('Login Response:', response.data);
       const { token, userId } = response.data; 
       login(userId, token); 
       navigate('/dashboard'); 
