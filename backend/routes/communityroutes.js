@@ -14,7 +14,8 @@ router.put('/:communityId', commcontroller.updateComm);
 router.delete('/:communityId', commcontroller.deleteComm);
 router.get('/users/:userId', commcontroller.getCreatorcomm);
 
-router.post('/:communityid/announcement', commcontroller.postannouncement);
+router.post('/:communityId/announcement', commcontroller.postannouncement);
+router.get('/:communityid/announcement', commcontroller.getannouncement);
 
 router.delete('/:communityid/announcement/:announcementId', commcontroller.deleteannouncement)
 
@@ -27,5 +28,9 @@ router.post('/upload', upload.single('image'), commcontroller.uploadImage);
 router.get('/created/:userId', commcontroller.getCommunitiesByUserId);
 router.get('/joined/:userId', commcontroller.joinedByUserId);
 router.get('/:communityId/tags', commcontroller.getCommunitiesByTags); 
+
+router.get('/:communityId/requests', commcontroller.getRequests);
+router.post('/:communityId/accept-request', commcontroller.acceptRequest);
+router.delete('/:communityId/reject-request', commcontroller.rejectRequest);
 
 module.exports = router;

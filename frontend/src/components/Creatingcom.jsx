@@ -47,7 +47,7 @@ const Creatingcom = () => {
           <button
             onClick={handleExploreClick}
             className="px-6 py-3 rounded-lg bg-customblue text-white text-lg font-semibold inline-block mt-5">
-            Explore
+            Create
           </button>
         </div>
       </div>

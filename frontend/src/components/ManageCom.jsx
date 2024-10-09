@@ -7,6 +7,7 @@ import MakeAnnouncements from './MakeAnnouncements';
 import EditDetails from './EditDetails';
 import ModerationTools from './ModerationTools';
 import Feedback from './Feedback';
+import JoinRequests from './JoinRequests';
 
 const ManageCom = () => {
   const { communityId } = useParams();
@@ -53,6 +54,8 @@ const ManageCom = () => {
         return <ModerationTools community={community} />;
       case 'Feedback':
         return <Feedback community={community} />;
+      case 'See Requests':
+        return <JoinRequests community={community} />;
       default:
         return <Insights community={community} />;
     }
@@ -67,7 +70,7 @@ const ManageCom = () => {
       {/* Sidebar */}
       <div className="w-[299px] h-[748px] relative bg-white shadow">
         <div className="h-[439px] pl-8 pr-[11px] pt-12 pb-[126px] left-[12px] top-[100px] absolute flex-col justify-start items-end gap-[20px] inline-flex">
-          {['Insights', 'ManageMembers', 'MakeAnnouncement', 'EditDetails', 'ModerationTools', 'Feedback'].map((item) => (
+          {['Insights', 'ManageMembers', 'MakeAnnouncement', 'EditDetails', 'ModerationTools', 'Feedback','See Requests'].map((item) => (
             <div
               key={item}
               className="self-stretch h-[45px] flex items-center cursor-pointer"

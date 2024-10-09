@@ -14,7 +14,7 @@ const announceschema = new Schema({
     community: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'community' // Reference to the Community model
+        ref: 'Community' // Reference to the Community model
     }
 }, { timestamps: true });
 

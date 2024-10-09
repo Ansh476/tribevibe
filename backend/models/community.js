@@ -67,6 +67,10 @@ const communityschema = new Schema({
             required: false
         }
     ],
+    joinRequests: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User'
+    }],
     
 });
 

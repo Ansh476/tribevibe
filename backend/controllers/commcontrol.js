@@ -1,5 +1,6 @@
 const Community = require('../models/community');
 const User = require('../models/usermodel');
+const Announcement = require('../models/announce')
 const HttpError = require('../models/HttpError');
 const Feedback = require('../models/feedback');
 const { cloudinary } = require('../cloudConfig');
@@ -24,7 +25,7 @@ const createcommunity = async (req, res, next) => {
     creator,
     tags,
     members: [],
-    joinRequests: approval === 'Approved Only' ? [] : undefined, 
+    joinRequests: [], 
   });
 
   try {
@@ -224,31 +225,30 @@ function asyncWrap(fn){
   }
 }
 
-const postannouncement = asyncWrap(async (req, res, next) => {
-  console.log("Request Body:", req.body);
-  console.log("Request Params:", req.params);
+const postannouncement = async (req, res, next) => {
+  try {
+    const { message, imgfile } = req.body; 
+    const communityId = req.params.communityId;
 
-  const { message ,imgfile} = req.body; // Destructure the announcement data
-  const communityId = req.params.communityid; // Ensure casing matches
 
-  // Fetch community to ensure it exists
-  const community = await Community.findById(communityId);
-  if (!community) {
-    return res.status(404).json({ message: "Community not found" });
+    const community = await Community.findById(communityId);
+    if (!community) { 
+      return res.status(404).json({ message: "Community not found" });
+    }
+    const newAnnouncement = new Announcement({
+      message: message,
+      imgfile: imgfile,
+      community: communityId, 
+    });
+
+    await newAnnouncement.save();
+
+    res.status(201).json({ message: "Announcement posted successfully!" });
+  } catch (err) {
+    next(err);
   }
+};
 
-  // Create a new announcement instance
-  const newAnnouncement = new Announcement({
-    message: message,
-    imgfile: imgfile, // Get the uploaded image path from req.file
-    community: communityId, // Link to the community
-  });
-
-  // Save the announcement to the database
-  await newAnnouncement.save();
-
-  res.status(201).json({ message: "Announcement posted successfully!" });
-});
 
 const getannouncement = asyncWrap(async (req, res, next) => {
   try {
@@ -420,4 +420,66 @@ const getCommunitiesByTags = async (req, res, next) => {
   }
 };
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags};
+const getRequests = async (req, res) => {
+  try {
+      const community = await Community.findById(req.params.communityId).populate('joinRequests', 'username'); // Populate members with username
+
+      if (!community) {
+          return res.status(404).json({ message: 'Community not found.' });
+      }
+
+      // Map the populated requests to include only necessary fields
+      const joinRequests = community.joinRequests.map(request => ({
+          _id: request._id,
+          username: request.username,
+      }));
+
+      res.status(200).json(joinRequests); // Return the array
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error.' });
+  }
+};
+
+const acceptRequest = async (req, res) => {
+  const { _id } = req.body; // Expecting username in the request body
+  try {
+      const community = await Community.findById(req.params.communityId);
+      if (!community) return res.status(404).json({ message: 'Community not found.' });
+
+      community.members.push(_id);
+      community.joinRequests = community.joinRequests.filter(req => !req.equals(_id));
+      await community.save();
+
+      // Update the user's joinedCommunities
+      const user = await User.findById(_id);
+      if (user) {
+          user.communitiesJoined.push(community._id);
+          await user.save();
+      }
+
+      res.status(200).json({ message: 'Request accepted successfully.' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error.' });
+  }
+};
+
+const rejectRequest = async (req, res) => {
+  const { _id } = req.body; 
+  try {
+      const community = await Community.findById(req.params.communityId);
+      if (!community) return res.status(404).json({ message: 'Community not found.' });
+
+      community.joinRequests = community.joinRequests.filter(req => !req.equals(_id));
+      await community.save();
+
+      res.status(200).json({ message: 'Request rejected successfully.' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error.' });
+  }
+};
+
+
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest};

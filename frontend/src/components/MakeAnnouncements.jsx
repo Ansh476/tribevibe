@@ -10,21 +10,25 @@ const MakeAnnouncements = () => {
 
   const onSubmit = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append('image', data.image[0]);
-
-      const imageResponse = await axios.post('http://localhost:5000/api/community/upload', formData);
-      const imageUrl = imageResponse.data.url;
-
-      console.log('Image URL: ' , imageUrl);
-
+      let imageUrl = '';
+  
+      // Check if an image file exists
+      if (data.image && data.image.length > 0) {
+        const formData = new FormData();
+        formData.append('image', data.image[0]);
+  
+        const imageResponse = await axios.post('http://localhost:5000/api/community/upload', formData);
+        imageUrl = imageResponse.data.url; // Get the URL from the response
+        console.log('Image URL: ', imageUrl);
+      }
+  
       const announcementData = {
         message: data.message,
-        imgfile: String(imageUrl),
+        imgfile: String(imageUrl), 
       };
-
+  
       await axios.post(`http://localhost:5000/api/community/${communityId}/announcement`, announcementData);
-
+  
       setPopupVisible(true);
       setTimeout(() => {
         setPopupVisible(false);
@@ -57,7 +61,7 @@ const MakeAnnouncements = () => {
             type="file"
             accept="image/*"
             className="w-full py-2 px-4 bg-[#dae4fb]/80 rounded-lg text-xl font-light text-[#393433] focus:outline-none focus:ring-2 focus:ring-[#0c87f2]"
-            {...register('image', { required: 'Image is required' })}
+            {...register('image')}
           />
           {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
         </div>
