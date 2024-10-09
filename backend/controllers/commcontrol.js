@@ -252,23 +252,6 @@ const removeuser = async (req, res, next) => {
   res.status(200).json({ message: "User removed from community successfully" });
 };
 
-const getfeedback = async (req, res, next) => {
-  const { communityId } = req.params;
-  try{
-  const community = await Community.findById(communityId);
-  if (!community) {
-    return res.status(404).json({ message: "Community not found" });
-  }
-
-  const feedback = await Feedback.find({ community: communityId })
-    .populate('user', 'username') 
-    .populate('community', 'name'); 
-
-  res.status(200).json({ feedback });
-}catch(err){
-  res.status(500).json({ message: "Fetching feedback failed" });
-}};
-
 const uploadImage = async (req, res) => {
   try {
       const file = req.file; 
@@ -349,6 +332,23 @@ const postfeedback = asyncWrap(async (req, res, next) => {
   
   await newFeedback.save();
   res.status(201).json({ message: "Feedback posted successfully!" });
+});
+
+const getfeedback = asyncWrap(async (req, res, next) => {
+  try {
+    const communityId = req.params.communityid; // Fetching communityId from request parameters
+// Log the communityId
+
+    // Fetch feedbacks for the community and populate user details
+    const feedbacks = await Feedback.find({ community: communityId })
+      .populate('user', 'username') // Populate 'user' with only the 'username'
+      .sort({ createdAt: -1 }); // Sort by newest feedbacks first
+// Log the fetched feedbacks
+    res.status(200).json(feedbacks);
+  } catch (error) {
+    console.error("Error fetching feedbacks:", error); // Log the error
+    res.status(500).json({ message: 'Error fetching feedbacks' });
+  }
 });
 
 module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId};
