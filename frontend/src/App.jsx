@@ -14,6 +14,7 @@ import CreatedComm from './components/CreatedComm'
 import JoinedComm from './components/JoinedComm'
 import Communitymodal from './components/Communitymodal'
 import { AuthProvider } from './components/authentication/Authcontext'
+import ManageCom from './components/ManageCom'
 import CommunityPage from './components/CommunityPage'
 
 function App() {

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // Use useParams to access communityId from the URL
-import axios from 'axios'; // Import axios for making API calls
+import { useParams } from 'react-router-dom';
+import axios from 'axios'; 
 import Insights from './Insights';
 import ManageMembers from './ManageMembers';
 import MakeAnnouncements from './MakeAnnouncements';
-// import EditDetails from './EditDetails';
+import EditDetails from './EditDetails';
 import ModerationTools from './ModerationTools';
-import Feedback from './Feedback'; // Import all necessary components
+import Feedback from './Feedback'; 
 
 const ManageCom = () => {
-  const { communityId } = useParams(); // Get communityId from URL parameters
+  const { communityId } = useParams(); 
   const [community, setCommunity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,7 +42,7 @@ const ManageCom = () => {
   const renderComponent = () => {
     switch (activeComponent) {
       case 'Insights':
-        return <Insights community={community} />; // Pass the community data to the component if needed
+        return <Insights community={community} />; 
       case 'ManageMembers':
         return <ManageMembers community={community} />;
       case 'MakeAnnouncement':
