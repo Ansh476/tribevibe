@@ -1,23 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const Feedback = () => {
-    const initialFeedbacks = [
-        { id: 1, user: 'Alice Smith', comment: 'Great platform, really helpful!', date: '2024-09-25' },
-        { id: 2, user: 'John Doe', comment: 'I love the features offered, but the UI could be better.', date: '2024-09-26' },
-        { id: 3, user: 'Marvin McKinney', comment: 'I appreciate the community support!', date: '2024-09-27' },
-        // Add more sample feedback as needed
-    ];
-
-    const [feedbacks, setFeedbacks] = useState(initialFeedbacks);
+    const { communityId } = useParams(); // Get communityId from URL
+    const [feedbacks, setFeedbacks] = useState([]); // State for fetched feedbacks
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Fetch feedbacks from backend when the component mounts
+    useEffect(() => {
+        const fetchFeedbacks = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:5000/api/community/${communityId}/feedback`
+                );
+                setFeedbacks(response.data); // Set fetched feedbacks
+            } catch (error) {
+                console.error('Error fetching feedbacks:', error.response || error.message);
+            }
+        };
+
+        fetchFeedbacks();
+    }, [communityId]); // Dependency on communityId
+
+    // Handle search input
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     };
 
+    // Filter feedbacks based on search term
     const filteredFeedbacks = feedbacks.filter(feedback =>
-        feedback.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        feedback.comment.toLowerCase().includes(searchTerm.toLowerCase())
+        feedback.user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feedback.feedbackmsg.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -38,10 +52,10 @@ const Feedback = () => {
                 <h2 className="text-lg font-semibold text-[#0a171f] mb-4 font-['League Spartan']">Feedback List:</h2>
                 {filteredFeedbacks.length > 0 ? (
                     filteredFeedbacks.map(feedback => (
-                        <div key={feedback.id} className="flex flex-col mb-4 border-b border-gray-200 pb-2">
-                            <span className="font-medium text-[#393433]">{feedback.user}</span>
-                            <span className="text-md text-[#5c5c5c]">{feedback.comment}</span>
-                            <span className="text-sm text-gray-500">{feedback.date}</span>
+                        <div key={feedback._id} className="flex flex-col mb-4 border-b border-gray-200 pb-2">
+                            <span className="font-medium text-[#393433]">{feedback.user.username}</span>
+                            <span className="text-md text-[#5c5c5c]">{feedback.feedbackmsg}</span>
+                            <span className="text-sm text-gray-500">{feedback.rating} ⭐</span>
                         </div>
                     ))
                 ) : (
