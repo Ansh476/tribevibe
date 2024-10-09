@@ -1,31 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'; // Use useParams to access communityId from the URL
+import axios from 'axios'; // Import axios for making API calls
 import Insights from './Insights';
 import ManageMembers from './ManageMembers';
+import MakeAnnouncements from './MakeAnnouncements';
+// import EditDetails from './EditDetails';
+import ModerationTools from './ModerationTools';
+import Feedback from './Feedback'; // Import all necessary components
 
-const Managecom = () => {
+const ManageCom = () => {
+  const { communityId } = useParams(); // Get communityId from URL parameters
+  const [community, setCommunity] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeComponent, setActiveComponent] = useState('Insights');
+
+  // Fetch community data from backend
+  useEffect(() => {
+    if (!communityId) {
+      setError("Community ID is not provided.");
+      setLoading(false);
+      return;
+    }
+
+    const fetchCommunityDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`http://localhost:5000/api/community/${communityId}`);
+        setCommunity(response.data.community); // Adjust based on the response structure
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching community details:", err);
+        setError("Failed to fetch community details.");
+        setLoading(false);
+      }
+    };
+
+    fetchCommunityDetails();
+  }, [communityId]);
 
   const renderComponent = () => {
     switch (activeComponent) {
       case 'Insights':
-        return <Insights />;
+        return <Insights community={community} />; // Pass the community data to the component if needed
       case 'ManageMembers':
-        return <ManageMembers />;
+        return <ManageMembers community={community} />;
       case 'MakeAnnouncement':
-        return <MakeAnnouncement />;
+        return <MakeAnnouncements community={community} />;
       case 'EditDetails':
-        return <EditDetails />;
+        return <EditDetails community={community} />;
       case 'ModerationTools':
-        return <ModerationTools />;
+        return <ModerationTools community={community} />;
       case 'Feedback':
-        return <Feedback />;
+        return <Feedback community={community} />;
       default:
-        return <Insights />;
+        return <Insights community={community} />;
     }
   };
 
+  // Loading and error handling
+  if (loading) return <div>Loading community details...</div>;
+  if (error) return <div>{error}</div>; // Display error message
+
   return (
-    <div className="w-full relative shadow-[0px_4px_4px_rgba(0,_0,_0,_0.25)] bg-[#DAE5FCC7] min-h-screen flex flex-col md:flex-row"> {/* Updated background color */}
+    <div className="w-full relative shadow-[0px_4px_4px_rgba(0,_0,_0,_0.25)] bg-[#DAE5FCC7] min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
       <div className="w-[299px] h-[748px] relative bg-white shadow">
         <div className="h-[439px] pl-8 pr-[11px] pt-12 pb-[126px] left-[12px] top-[100px] absolute flex-col justify-start items-end gap-[20px] inline-flex">
@@ -48,7 +86,6 @@ const Managecom = () => {
 
       {/* Main Content */}
       <div className="absolute top-[65px] left-[313px] shadow-[0px_4px_4px_rgba(0,_0,_0,_0.25)] rounded-[10px] bg-gray w-full md:w-[1114px] h-auto md:h-[719px] overflow-hidden p-4">
-        
         <div className="absolute top-[7px] left-[30px]">
           {renderComponent()}
         </div>
@@ -61,4 +98,4 @@ const Managecom = () => {
   );
 };
 
-export default Managecom;
+export default ManageCom;
