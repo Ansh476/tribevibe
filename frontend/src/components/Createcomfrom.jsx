@@ -8,18 +8,19 @@ const CreateComForm = () => {
   const { userId: contextUserId } = useContext(AuthContext); 
   const [userId, setUserId] = useState(contextUserId || localStorage.getItem('userId'));
   const [popupVisible, setPopupVisible] = useState(false);
+  const [tags, setTags] = useState(''); 
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
 
   const onSubmit = async (data) => {
     try {
-
       const formData = new FormData();
       formData.append('image', data.image[0]);
 
       const response = await axios.post('http://localhost:5000/api/community/upload', formData);
       const imageUrl = response.data.url;
+
       const completeFormData = {
         title: data.title,
         description: data.description,
@@ -30,9 +31,9 @@ const CreateComForm = () => {
         gender: data.gender,
         membercount: data.members,
         moneystatus: data.payment,
-        approval: data.approval,
         imageurl: String(imageUrl),
-        creator: userId, 
+        creator: userId,
+        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''), // Split tags into an array and filter out empty tags
       };
 
       console.log(completeFormData);
@@ -103,6 +104,18 @@ const CreateComForm = () => {
           {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>}
         </div>
 
+        {/* Tags */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Enter tags separated by commas"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)} // Update the tags state on change
+          />
+          {tags === '' && <p className="text-red-500 text-sm mt-1">Tags are required</p>} {/* Error handling for tags */}
+        </div>
+
         {/* Age Group */}
         <div className="mb-6">
           <div className="mt-2">
@@ -170,48 +183,32 @@ const CreateComForm = () => {
         <div className="mb-6">
           <div className="mt-2">
             <label className="mr-4">
-              <input type="radio" value="Paid" {...register('payment', { required: 'Select Paid or Unpaid' })} /> Paid
+              <input type="radio" value="Paid" {...register('payment', { required: 'Select Payment Status' })} /> Paid
             </label>
             <label>
-              <input type="radio" value="Unpaid" {...register('payment', { required: 'Select Paid or Unpaid' })} /> Unpaid
+              <input type="radio" value="Unpaid" {...register('payment', { required: 'Select Payment Status' })} /> Unpaid
             </label>
           </div>
           {errors.payment && <p className="text-red-500 text-sm mt-1">{errors.payment.message}</p>}
-        </div>
-
-        <div className="mb-6">
-          <div className="mt-2">
-            <label className="mr-4">
-              <input type="radio" value="Open Community" {...register('approval', { required: 'Community Type' })} /> Open Community
-            </label>
-            <label className="mr-4">
-              <input type="radio" value="Approved Only" {...register('approval', { required: 'Community Type' })} /> Approved Only
-            </label>
-          </div>
-          {errors.approval && <p className="text-red-500 text-sm mt-1">{errors.approval.message}</p>}
         </div>
 
         {/* Image Upload */}
         <div className="mb-6">
           <input
             type="file"
-            accept="image/*"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             {...register('image', { required: 'Image is required' })}
           />
           {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
         </div>
 
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            className={`w-full bg-blue-500 text-white py-3 rounded-lg cursor-pointer hover:bg-blue-600 text-center block ${!isValid ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={!isValid}
-          >
-            Create Community
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
+          disabled={!isValid}
+        >
+          Create Community
+        </button>
       </form>
     </div>
   );
