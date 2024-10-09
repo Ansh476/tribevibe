@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Communitymodal from './Communitymodal'; // Import the modal component
+import axios from 'axios';
 
 const EventCard = ({ event }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +14,21 @@ const EventCard = ({ event }) => {
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
+
+  const handleJoin = async () => {
+    try {
+        
+        const token = localStorage.getItem('token'); 
+        const response = await axios.post(`http://localhost:5000/api/community/${event._id}/join`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`, 
+            },
+        });
+        alert(response.data.message);
+    } catch (error) {
+        alert(error.response?.data?.message || 'Failed to join community'); 
+    }
+};
 
   return (
     <div className="flex-row p-[24px] justify-center items-start gap-[36px] rounded-[30px] bg-gradient-to-b from-[#E6BFE0] to-[#61355A] shadow-md">
@@ -39,6 +55,7 @@ const EventCard = ({ event }) => {
       {/* Join Button */}
       <button 
         className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-gradient-to-b from-[#E6BFE0] to-[#61355A] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] ml-8 transition-transform duration-200 hover:scale-105"
+        onClick={handleJoin}
       >
         Join
       </button>

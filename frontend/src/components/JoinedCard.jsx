@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; 
 
 const JoinedCard = ({ event }) => {
   return (
@@ -11,18 +12,21 @@ const JoinedCard = ({ event }) => {
       <h3 className="text-[#0D87F2] font-poppins text-[24px] font-bold leading-[50px] mt-4">
         {event.title}
       </h3>
+      <Link to={`/view/community/${event._id}`}>
+        <button 
+          className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-[#0D87F2] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] transition-transform duration-200 hover:scale-105"
+        >
+          View
+        </button>
+      </Link>
       <button 
-        className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-[#0D87F2] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px]"
-      >
-        Details
-      </button>
-      <button 
-        className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-[#0D87F2] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] ml-8"
+        className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-[#0D87F2] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] ml-8 transition-transform duration-200 hover:scale-105"
+        onClick={handleExit}
       >
         Exit
       </button>
     </div>
   );
-};
+};  
 
 export default JoinedCard;
