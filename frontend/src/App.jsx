@@ -12,7 +12,9 @@ import Createcomform from './components/Createcomfrom'
 import Signup from './components/Signup'
 import CreatedComm from './components/CreatedComm'
 import JoinedComm from './components/JoinedComm'
+import Communitymodal from './components/Communitymodal'
 import { AuthProvider } from './components/authentication/Authcontext'
+import CommunityPage from './components/CommunityPage'
 
 function App() {
   const routerapp = createBrowserRouter([
@@ -59,6 +61,14 @@ function App() {
         {
           path:"/joinedcom",
           element:<JoinedComm />
+        },
+        {
+          path:"/community/:communityId",
+          element:<Communitymodal/>
+        },
+        {
+          path:"/view/community/:communityId",
+          element:<CommunityPage/>
         },
       ],
       errorElement:<Error/>

@@ -1,17 +1,56 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EnFeedback = () => {
+    const { communityId } = useParams(); // Get communityId from the URL
+    const navigate = useNavigate();
     const [feedback, setFeedback] = useState('');
     const [rating, setRating] = useState(0);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
-    const handleSubmit = (e) => {
+    // Handle form submission
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Feedback submitted:', { feedback, rating });
+
+        // Ensure both rating and feedback are provided
+        if (!rating || !feedback) {
+            setError('Please provide both feedback and a rating.');
+            return;
+        }
+
+        try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json', // Only Content-Type needed now
+                },
+            };
+
+            // Post the feedback to the backend
+            const response = await axios.post(
+                `http://localhost:5000/api/community/${communityId}/feedback`,
+                { feedbackmsg: feedback, rating },
+                config
+            );
+
+            console.log('Feedback submitted:', response.data);
+            setSuccess('Feedback posted successfully!');
+            setError(null);
+            setFeedback(''); // Clear feedback input
+            setRating(0);    // Reset rating selection
+            navigate(`/view/community/${communityId}`); // Redirect to the community view page after submission
+        } catch (error) {
+            console.error('Error posting feedback:', error);
+            setError('Failed to post feedback. Please try again.');
+        }
     };
 
     return (
         <div className="w-full h-full bg-[#f4f3fe] rounded-[10px] p-4 overflow-auto">
             <h2 className="text-[#150e5d] text-xl md:text-2xl font-semibold font-['League Spartan'] mb-4">Feedback</h2>
+            {error && <div className="text-red-500 mb-4">{error}</div>}
+            {success && <div className="text-green-500 mb-4">{success}</div>}
             <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
                 <label className="text-[#150e5d] text-md md:text-lg font-medium">
                     Your Feedback:

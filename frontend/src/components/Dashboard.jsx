@@ -7,6 +7,7 @@ const Dashboard = () => {
     const [events, setEvents] = useState([]); 
     const [filteredEvents, setFilteredEvents] = useState([]); 
     const [searchText, setSearchText] = useState("");
+    const [locationText, setLocationText] = useState("");
     const [isClicked, setIsClicked] = useState(false);
 
     const fetchData = async () => {
@@ -25,19 +26,25 @@ const Dashboard = () => {
     }, []);
 
     const handleSearch = () => {
-        const filteredList = events.filter((event) =>
-            event.title.toLowerCase().includes(searchText.toLowerCase())
-        );
+        const filteredList = events.filter((event) => {
+            console.log(event);
+            
+            const matchesTopic = searchText === "" || event.title.toLowerCase().includes(searchText.toLowerCase());
+            const matchesLocation = locationText === "" || event.location.toLowerCase().includes(locationText.toLowerCase()); 
+            console.log(matchesTopic);
+            console.log(matchesLocation);
+            return matchesTopic && matchesLocation;
+        });
         setFilteredEvents(filteredList);
         setIsClicked(true);
         setTimeout(() => setIsClicked(false), 200);
     };
 
     useEffect(() => {
-        if (searchText === "") {
+        if (searchText === "" && locationText === "") {
             setFilteredEvents(events); 
         }
-    }, [searchText, events]); 
+    }, [searchText, locationText, events]); 
 
     return (
         <div className="bg-[#FDE3FA] min-h-screen p-[30px] mt-12">
@@ -46,6 +53,8 @@ const Dashboard = () => {
                     <div className='relative grow shrink basis-0 self-stretch'>
                         <input
                             type="text"
+                            value={locationText}
+                            onChange={(e) => setLocationText(e.target.value)}
                             placeholder="Where"
                             className='h-[20px] text-[#0c87f2] text-[18px] font-bold font-["League Spartan"] w-full bg-transparent border-none focus:outline-none'
                         />
@@ -69,7 +78,7 @@ const Dashboard = () => {
                 <div className='ml-auto cursor-pointer' onClick={handleSearch}>
                     <IoSearch 
                         size={24} 
-                        className={"bg-[#d9d9d9] text-[#BE07A2] text-2xl h-[60px] w-[62px] rounded-full p-3 transition-transform duration-200 ${isClicked ? 'transform scale-95' : '' "}
+                        className={`bg-[#d9d9d9] text-[#BE07A2] text-2xl h-[60px] w-[62px] rounded-full p-3 transition-transform duration-200 ${isClicked ? 'transform scale-95' : ''}`}
                     />
                 </div>
             </div>

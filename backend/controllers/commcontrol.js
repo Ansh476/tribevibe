@@ -252,25 +252,6 @@ const removeuser = async (req, res, next) => {
   res.status(200).json({ message: "User removed from community successfully" });
 };
 
-const postfeedback = asyncWrap(async (req, res, next) => {
-  const { feedbackmsg, rating } = req.body;
-  const { communityId } = req.params;
-  const userId = req.user.id; //authentication token
-
-  const community = await Community.findById(communityId);
-  if (!community) {
-    return res.status(404).json({ message: "Community not found" });
-  }
-  let newfeedback = new Feedback({
-    feedbackmsg: feedbackmsg,
-    rating: rating,
-    community: communityId,
-    user: userId,
-  })
-  await newfeedback.save();
-  res.status(201).json({ message: "Feedback posted successfully!" });
-});
-
 const getfeedback = async (req, res, next) => {
   const { communityId } = req.params;
   try{
@@ -341,5 +322,33 @@ const joinedByUserId = async (req, res) => {
       return res.status(500).json({ message: 'Server error' });
   }
 };
+
+const postfeedback = asyncWrap(async (req, res, next) => {
+  console.log("Request Body:", req.body);
+  console.log("Request Params:", req.params);
+
+  const { feedbackmsg, rating } = req.body;
+  const communityId = req.params.communityid; // ensure casing matches
+
+  // Fetch community with populated creator details
+  const community = await Community.findById(communityId).populate('creator'); // Ensure you populate the creator field
+
+  if (!community) {
+      return res.status(404).json({ message: "Community not found" });
+  }
+
+  // Get userId from the community's creator
+  const userId = community.creator._id; // Ensure you are accessing the correct field
+
+  let newFeedback = new Feedback({
+      feedbackmsg: feedbackmsg,
+      rating: rating,
+      community: communityId,
+      user: userId,
+  });
+  
+  await newFeedback.save();
+  res.status(201).json({ message: "Feedback posted successfully!" });
+});
 
 module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId};
