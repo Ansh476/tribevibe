@@ -11,7 +11,7 @@ const communityschema = new Schema({
         type: String,
         required: true
     },
-    location:{
+    location: {
         type: String,
         required: true
     },
@@ -20,11 +20,11 @@ const communityschema = new Schema({
         enum: ['Above 18', 'Open for All'], 
         required: true
     },
-    date:{
+    date: {
         type: Date,
         required: true
     },
-    time:{
+    time: {
         type: String,
         required: true
     },
@@ -33,24 +33,21 @@ const communityschema = new Schema({
         enum: ['Male', 'Female', 'Other', 'All'], 
         required: true
     },
-    membercount:{
+    membercount: {
         type: Number,
-        required: true
+        required: true,
+        default: 0 // Added default member count
     },
     moneystatus: {
         type: String,
         enum: ['Paid', 'Unpaid'],
         required: true
     },
-    approval: {
-        type: String,
-        enum: ['Open Community', 'Approved Only'],
-        required: true
-    },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-        }, 
+        ref: 'User',
+        required: true // Ensure creator is always specified
+    }, 
     imageurl: {
         type: String,
         required: false
@@ -59,11 +56,13 @@ const communityschema = new Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User'
     }],
-    joinRequests: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
-        required: false
-    }]
+    tags: [
+        {
+            type: String,
+            required: false
+        }
+    ],
+    
 });
 
 const Community = mongoose.model('Community', communityschema);
