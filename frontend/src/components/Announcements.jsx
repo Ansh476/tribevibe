@@ -1,36 +1,32 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import AnnouncementCard from './Announcementcard'; // Adjust the path as needed
+import { useParams } from 'react-router-dom';
 
 const Announcements = () => {
     const [announcements, setAnnouncements] = useState([]);
-
-    // Sample static data for announcements
-    const sampleAnnouncements = [
-        {
-            id: 1,
-            text: "Welcome to the community! We're excited to have you here.",
-            date: "2024-09-30",
-            time: "10:00 AM",
-            file: "link-to-file-1.pdf", // Replace with actual file links
-        },
-        {
-            id: 2,
-            text: "Don't miss our upcoming event on community guidelines.",
-            date: "2024-10-05",
-            time: "2:00 PM",
-            file: "link-to-file-2.pdf",
-        },
-        {
-            id: 3,
-            text: "New resources have been added to the community library.",
-            date: "2024-09-28",
-            time: "11:30 AM",
-            file: "",
-        },
-    ];
+    const { communityId } = useParams();
 
     useEffect(() => {
-        // Simulate fetching data from backend
-        setAnnouncements(sampleAnnouncements);
+        const fetchAnnouncements = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/community/${communityId}/announcement`);
+                console.log(response.data); // Log the response to see the structure
+
+                // Assuming response.data is an array of announcement objects
+                if (Array.isArray(response.data)) {
+                    setAnnouncements(response.data); // Set the announcements state to the fetched data
+                } else {
+                    console.error("Received data is not an array:", response.data);
+                    setAnnouncements([]); // Set to an empty array if not valid
+                }
+            } catch (error) {
+                console.error("Error fetching announcements:", error);
+                setAnnouncements([]); // Optionally set to an empty array on error
+            }
+        };
+
+        fetchAnnouncements();
     }, []);
 
     return (
@@ -39,15 +35,7 @@ const Announcements = () => {
             <div className="flex flex-col space-y-4">
                 {announcements.length > 0 ? (
                     announcements.map((announcement) => (
-                        <div key={announcement.id} className="bg-white rounded-lg shadow p-4">
-                            <h3 className="text-[#150e5d] font-semibold text-lg">{announcement.text}</h3>
-                            <p className="text-gray-600 text-sm mt-2">{`${announcement.date} at ${announcement.time}`}</p>
-                            {announcement.file && (
-                                <a href={announcement.file} className="text-[#bd06a2] text-sm mt-2 inline-block" target="_blank" rel="noopener noreferrer">
-                                    View Attached File
-                                </a>
-                            )}
-                        </div>
+                        <AnnouncementCard key={announcement._id} announcement={announcement} />
                     ))
                 ) : (
                     <p className="text-gray-600">No announcements available.</p>
@@ -58,4 +46,3 @@ const Announcements = () => {
 };
 
 export default Announcements;
-
