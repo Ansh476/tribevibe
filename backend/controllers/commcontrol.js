@@ -123,7 +123,7 @@ const exitCommunity = async (req, res, next) => {
 
 const getallComm = async (req, res, next) => {
   try {
-    const communities = await Community.find({}, 'title imageurl');
+    const communities = await Community.find({}, 'title imageurl location tags');
     res.status(200).json({ communities });
   } catch (err) {
     const error = new HttpError(500, 'Fetching communities failed.');
