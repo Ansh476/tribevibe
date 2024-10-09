@@ -43,7 +43,8 @@ const EventCard = ({ event }) => {
       <h3 className="text-[#FFFEFE] font-poppins text-[24px] font-bold leading-[50px] mt-4">
         {event.title}
       </h3>
-
+      <p className='hidden'>{event.location}</p>
+      <p className='hidden'>{event.tags.join(', ')}</p>
       {/* Details Button */}
       <button 
         onClick={handleDetailsClick} 
