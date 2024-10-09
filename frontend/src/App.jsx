@@ -70,6 +70,10 @@ function App() {
           path:"/view/community/:communityId",
           element:<CommunityPage/>
         },
+        {
+          path:"/manage/community/:communityId",
+          element:<ManageCom/>
+        }
       ],
       errorElement:<Error/>
     }
