@@ -4,11 +4,12 @@ import { IoSearch } from "react-icons/io5";
 import EventList from './EventList'; 
 
 const Dashboard = () => {
-    const [events, setEvents] = useState([]); 
+const [events, setEvents] = useState([]); 
     const [filteredEvents, setFilteredEvents] = useState([]); 
     const [searchText, setSearchText] = useState("");
     const [locationText, setLocationText] = useState("");
     const [isClicked, setIsClicked] = useState(false);
+    const [TagText, setTagText] = useState("");
 
     const fetchData = async () => {
         try {
@@ -26,25 +27,34 @@ const Dashboard = () => {
     }, []);
 
     const handleSearch = () => {
+        console.log("Events before search:", events);
+        console.log("Search Text:", searchText);
+        console.log("Location Text:", locationText);
+        
         const filteredList = events.filter((event) => {
-            console.log(event);
-            
-            const matchesTopic = searchText === "" || event.title.toLowerCase().includes(searchText.toLowerCase());
-            const matchesLocation = locationText === "" || event.location.toLowerCase().includes(locationText.toLowerCase()); 
-            console.log(matchesTopic);
-            console.log(matchesLocation);
-            return matchesTopic && matchesLocation;
+            console.log("Full Event Object:", event);
+
+            const title = event.title ? event.title.toLowerCase() : '';
+            const location = event.location ? event.location.toLowerCase() : '';
+
+            const matchesTopic = searchText === "" || title.includes(searchText.toLowerCase());
+            const matchesLocation = locationText === "" || location.includes(locationText.toLowerCase());
+            const matchesTags = TagText === "" || 
+                (event.tags && event.tags.some(tag => tag.toLowerCase().includes(TagText.toLowerCase())));
+
+            return matchesTopic && matchesLocation && matchesTags;
         });
+
         setFilteredEvents(filteredList);
         setIsClicked(true);
         setTimeout(() => setIsClicked(false), 200);
     };
 
     useEffect(() => {
-        if (searchText === "" && locationText === "") {
+        if (searchText === "" && locationText === "" && TagText === "") {
             setFilteredEvents(events); 
         }
-    }, [searchText, locationText, events]); 
+    }, [searchText, locationText, TagText, events]); 
 
     return (
         <div className="bg-[#FDE3FA] min-h-screen p-[30px] mt-12">
