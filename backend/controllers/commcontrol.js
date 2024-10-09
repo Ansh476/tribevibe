@@ -225,26 +225,48 @@ function asyncWrap(fn){
 }
 
 const postannouncement = asyncWrap(async (req, res, next) => {
-  const creatorId = req.user.id; 
-  const { message, imgfile } = req.body;
-  const { communityId } = req.params; 
+  console.log("Request Body:", req.body);
+  console.log("Request Params:", req.params);
 
+  const { message ,imgfile} = req.body; // Destructure the announcement data
+  const communityId = req.params.communityid; // Ensure casing matches
+
+  // Fetch community to ensure it exists
   const community = await Community.findById(communityId);
-  if (!community || community.creator.toString() !== creatorId) {
-    return res.status(403).json({ message: "Not authorized to post in this community" });
+  if (!community) {
+    return res.status(404).json({ message: "Community not found" });
   }
 
-  let newannouncement = new Announcement({
+  // Create a new announcement instance
+  const newAnnouncement = new Announcement({
     message: message,
-    imgfile: imgfile,
-    created_at: new Date(),
-    community: communityId,
-    creator: creatorId
+    imgfile: imgfile, // Get the uploaded image path from req.file
+    community: communityId, // Link to the community
   });
 
-  await newannouncement.save();
+  // Save the announcement to the database
+  await newAnnouncement.save();
 
   res.status(201).json({ message: "Announcement posted successfully!" });
+});
+
+const getannouncement = asyncWrap(async (req, res, next) => {
+  try {
+      const communityId = req.params.communityid; // Fetching communityId from request parameters
+      console.log("Fetching announcements for community ID:", communityId); // Log the communityId
+
+      // Fetch announcements for the community and sort them by createdAt
+      const announcements = await Announcement.find({ community: communityId })
+          .sort({ createdAt: -1 }) // Sort by newest announcements first
+
+      // Log the fetched announcements
+      console.log("Fetched announcements:", announcements);
+
+      res.status(200).json(announcements); // Respond with the fetched announcements
+  } catch (error) {
+      console.error("Error fetching announcements:", error); // Log the error
+      res.status(500).json({ message: 'Error fetching announcements' }); // Handle error response
+  }
 });
 
 const deleteannouncement = asyncWrap(async (req, res, next) => {
