@@ -1,3 +1,4 @@
+// CreatedCard.jsx
 import React from 'react';
 import { Link } from 'react-router-dom'; // Import Link for navigation
 
@@ -19,11 +20,13 @@ const CreatedCard = ({ event }) => {
           View
         </button>
       </Link>
+      <Link to={`/manage/community/${event._id}`}>
       <button 
         className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-[#0D87F2] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] ml-8 transition-transform duration-200 hover:scale-105"
       >
         Manage
       </button>
+      </Link>
     </div>
   );
 };  
