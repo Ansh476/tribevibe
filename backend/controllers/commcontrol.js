@@ -84,6 +84,39 @@ const joinCommunity = async (req, res, next) => {
   }
 };
 
+const exitCommunity = async (req, res, next) => {
+  const { communityId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return next(new HttpError(404, 'Community not found.'));
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new HttpError(404, 'User not found.'));
+    }
+
+    if (!community.members.includes(userId)) {
+      return next(new HttpError(400, 'User is not a member of this community.'));
+    }
+
+    // Remove user from the community's members
+    community.members = community.members.filter(member => !member.equals(userId));
+
+    // Correctly filter out the communityId from the user's communitiesJoined
+    user.communitiesJoined = user.communitiesJoined.filter(id => !id.equals(communityId));
+
+    await Promise.all([community.save(), user.save()]);
+
+    return res.status(200).json({ message: 'Exited community!', community });
+  } catch (err) {
+    return next(new HttpError(500, 'Exiting community failed.'));
+  }
+};
+
 
 const getallComm = async (req, res, next) => {
   try {
@@ -351,4 +384,4 @@ const getfeedback = asyncWrap(async (req, res, next) => {
   }
 });
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId};
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity};

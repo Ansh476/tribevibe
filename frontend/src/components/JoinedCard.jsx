@@ -1,7 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; 
+import axios from 'axios';
 
 const JoinedCard = ({ event }) => {
+  const handleExit = async () => {
+    try {
+      const token = localStorage.getItem('token'); 
+      const response = await axios.post(`http://localhost:5000/api/community/${event._id}/exitcomm`, {}, {
+          headers: {
+              Authorization: `Bearer ${token}`, 
+          },
+      });
+      alert(response.data.message);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to exit community'); 
+    }
+  };
+
   return (
     <div className="flex-row p-[24px] justify-center items-start gap-[36px] rounded-[30px] bg-[#FFF7FE] shadow-lg">
       <img 
@@ -21,7 +36,7 @@ const JoinedCard = ({ event }) => {
       </Link>
       <button 
         className="inline-flex px-[40px] py-2 justify-center items-center rounded-[30px] bg-[#0D87F2] shadow-md text-[#FFFEFE] font-poppins text-[16px] font-bold leading-[30px] ml-8 transition-transform duration-200 hover:scale-105"
-        // onClick={handleExit}
+        onClick={handleExit} 
       >
         Exit
       </button>

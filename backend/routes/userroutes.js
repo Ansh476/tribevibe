@@ -25,6 +25,5 @@ router.post('/login', [
 ], userController.login);
 
 router.get('/creator', jwtMiddleware, userController.getCreatorView);
-router.get('/exitcomm', jwtMiddleware, userController.exitCommunity);
 
 module.exports = router;

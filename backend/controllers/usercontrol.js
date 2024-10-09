@@ -4,7 +4,6 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-// const { cloudinary } = require('../cloudConfig');
 
 require('dotenv').config();
 
@@ -172,38 +171,7 @@ const getCreatorView = async (req, res, next) => {
     }
 };
 
-const exitCommunity = async (req, res, next) => {
-    const { communityId } = req.params;
-    const userId = req.user.id;
-  
-    try {
-      const community = await Community.findById(communityId);
-      if (!community) {
-        return next(new HttpError(404, 'Community not found.'));
-      }
-  
-      const user = await User.findById(userId);
-      if (!user) {
-        return next(new HttpError(404, 'User not found.'));
-      }
-  
-      // Check if the user is a member of the community
-      if (!community.members.includes(userId)) {
-        return next(new HttpError(400, 'User is not a member of this community.'));
-      }
-  
-      // Remove user from community members and community from user's joined communities
-      community.members = community.members.filter(member => !member.equals(userId));
-      user.communitiesJoined = user.communitiesJoined.filter(communityId => !communityId.equals(communityId));
-  
-      // Save both the community and user
-      await Promise.all([community.save(), user.save()]);
-  
-      return res.status(200).json({ message: 'Exited community!', community });
-    } catch (err) {
-      return next(new HttpError(500, 'Exiting community failed.'));
-    }
-  };
+
 
   
-module.exports = { signup, verifyOtp, login, getCreatorView, exitCommunity };
+module.exports = { signup, verifyOtp, login, getCreatorView };
