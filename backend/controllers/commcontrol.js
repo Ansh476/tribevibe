@@ -7,7 +7,8 @@ const { cloudinary } = require('../cloudConfig');
 require('dotenv').config();
 
 const createcommunity = async (req, res, next) => {
-  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, approval, creator, imageurl } = req.body;
+  const { title, description, location, agegrp, date, time, gender, membercount, moneystatus, approval, creator, imageurl,tags } = req.body;
+  console.log(req.body);
 
   const newCommunity = new Community({
     title,
@@ -22,6 +23,7 @@ const createcommunity = async (req, res, next) => {
     approval,
     imageurl,
     creator,
+    tags,
     members: [],
     joinRequests: approval === 'Approved Only' ? [] : undefined, 
   });
@@ -43,6 +45,7 @@ const createcommunity = async (req, res, next) => {
     return next(error);
   }
 };
+
 
 const joinCommunity = async (req, res, next) => {
   const { communityId } = req.params;
@@ -384,4 +387,19 @@ const getfeedback = asyncWrap(async (req, res, next) => {
   }
 });
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity};
+const getCommunitiesByTags = async (req, res, next) => {
+  const { tags } = req.body;
+
+  try {
+    const communities = await Community.find({ tags: { $in: tags } });
+    if (!communities.length) {
+      return res.status(404).json({ message: 'No communities found for the specified tags.' });
+    }
+
+    res.status(200).json({ communities });
+  } catch (err) {
+    return next(new HttpError(500, 'Fetching communities by tags failed.'));
+  }
+};
+
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags};
