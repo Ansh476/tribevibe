@@ -4,7 +4,7 @@ import { IoSearch } from "react-icons/io5";
 import EventList from './EventList'; 
 
 const Dashboard = () => {
-const [events, setEvents] = useState([]); 
+    const [events, setEvents] = useState([]); 
     const [filteredEvents, setFilteredEvents] = useState([]); 
     const [searchText, setSearchText] = useState("");
     const [locationText, setLocationText] = useState("");
@@ -78,11 +78,23 @@ const [events, setEvents] = useState([]);
                         type="text"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
-                        placeholder="Topic"
+                        placeholder="Title"
                         className='text-[#0c87f2] font-bold font-["League Spartan"] text-lg bg-transparent border-none focus:outline-none'
                     />
                     <div className='text-[#BE07A2] font-medium font-["League Spartan"] text-sm'>
-                        Search by tags
+                        Search by title
+                    </div>
+                </div>
+                <div className='flex flex-col justify-center ml-5 mt-2'>
+                    <input
+                        type="text"
+                        value={TagText}
+                        onChange={(e) => setTagText(e.target.value)}
+                        placeholder="Tags"
+                        className='text-[#0c87f2] font-bold font-["League Spartan"] text-lg bg-transparent border-none focus:outline-none'
+                    />
+                    <div className='text-[#BE07A2] font-medium font-["League Spartan"] text-sm'>
+                        Search by tag
                     </div>
                 </div>
                 <div className='ml-auto cursor-pointer' onClick={handleSearch}>
