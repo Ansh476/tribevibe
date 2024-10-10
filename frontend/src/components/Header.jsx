@@ -70,13 +70,13 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/" className="cursor-pointer flex items-center justify-center">
+                  <Link to="/" className="cursor-pointer flex items-center justify-center" onClick={() => window.scrollTo(0, 0)}>
                     Home
                   </Link>
-                  <Link to="/#JoinCom" className="cursor-pointer flex items-center justify-center">
+                  <Link to="/#JoinCom" className="cursor-pointer flex items-center justify-center" onClick={() => window.scrollTo(0, 0)}>
                     Join Community
                   </Link>
-                  <Link to="/#CreateCom" className="cursor-pointer flex items-center justify-center">
+                  <Link to="/#CreateCom" className="cursor-pointer flex items-center justify-center" onClick={() => window.scrollTo(0, 0)}>
                     Create Community
                   </Link>
                 </>
@@ -86,10 +86,10 @@ const Header = () => {
             <div className="hidden md:flex justify-end items-center gap-4">
               {isLoggedIn ? ( 
                 <>
-                  <Link to="/joinedcom" className="cursor-pointer pr-5">
+                  <Link to="/joinedcom" className="cursor-pointer pr-5" onClick={() => window.scrollTo(0, 0)}>
                     Joined Communities
                   </Link>
-                  <Link to="/created" className="cursor-pointer pr-5">
+                  <Link to="/created" className="cursor-pointer pr-5" onClick={() => window.scrollTo(0, 0)}>
                     Created Communities
                   </Link>
                   <button onClick={handleLogout} className="cursor-pointer pr-5">
@@ -98,10 +98,10 @@ const Header = () => {
                 </>
               ) : (
                 <> 
-                  <Link to="/login" className="cursor-pointer pr-5">
+                  <Link to="/login" className="cursor-pointer pr-5" onClick={() => window.scrollTo(0, 0)}>
                     Login
                   </Link>
-                  <Link to="/signup" className="cursor-pointer pr-5">
+                  <Link to="/signup" className="cursor-pointer pr-5" onClick={() => window.scrollTo(0, 0)}>
                     Sign Up
                   </Link>
                 </>

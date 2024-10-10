@@ -25,10 +25,10 @@ const ManageMembers = () => {
         fetchMembers();
     }, [communityId]);
 
-    const handleRemove = async (username) => {
+    const handleRemove = async (_id) => {
         try {
             await axios.put(`http://localhost:5000/api/community/${communityId}/removemember`, {
-                username
+                _id
             });
             
             // Fetch members again after removing to ensure UI is in sync
@@ -81,7 +81,7 @@ const ManageMembers = () => {
                             </div>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => handleRemove(member.username)} // Remove by username
+                                    onClick={() => handleRemove(member._id)} // Remove by username
                                     className="px-4 py-2 bg-[#f44336] text-white text-sm font-semibold rounded-lg shadow-md hover:bg-[#c11f1f]"
                                 >
                                     Remove

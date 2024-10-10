@@ -33,5 +33,7 @@ router.get('/:communityId/requests', commcontroller.getRequests);
 router.post('/:communityId/accept-request', commcontroller.acceptRequest);
 router.delete('/:communityId/reject-request', commcontroller.rejectRequest);
 router.get('/:communityId/members', commcontroller.getCommunitymembers);
+router.put('/:communityId/removemember', commcontroller.removeCommunityMember);
+router.get('/:communityId/usercount',commcontroller.getUserCount);
 
 module.exports = router;

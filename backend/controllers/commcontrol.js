@@ -502,4 +502,59 @@ const getCommunitymembers = async (req, res) => {
   }
 };
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers};
+const removeCommunityMember = async (req, res) => {
+  const { communityId } = req.params;
+  const { _id } = req.body;
+
+  try {
+      const community = await Community.findById(communityId);
+      if (!community) {
+          return res.status(404).json({ message: "Community not found." });
+      }
+
+      const user = await User.findById(_id);
+      if (!user) {
+          return res.status(400).json({ message: "User not found." });
+      }
+
+      if (!community.members.includes(_id)) {
+          return res.status(400).json({ message: "User not a member of the community." });
+      }
+
+      community.members = community.members.filter(member => !member.equals(_id));
+      // community.joinRequests = community.joinRequests.filter(req => !req.equals(_id));
+      await community.save();
+
+      console.log("passed this point");
+
+      await User.updateOne(
+        { _id: user._id },
+        { $pull: { communitiesJoined: communityId } }
+    );
+
+      res.json({ message: "Member removed from the community." });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error." });
+  }
+}
+
+const getUserCount = async (req, res, next) => {
+  const { communityId } = req.params;
+
+  try {
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return next(new HttpError(404, 'Community not found.'));
+    }
+
+    const userCount = community.members.length;
+    return res.status(200).json({ userCount });
+  } catch (err) {
+    return next(new HttpError(500, 'Fetching user count failed.'));
+  }
+};
+
+
+
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers, removeCommunityMember, getUserCount};
