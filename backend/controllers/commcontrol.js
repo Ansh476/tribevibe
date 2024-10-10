@@ -481,5 +481,25 @@ const rejectRequest = async (req, res) => {
   }
 };
 
+const getCommunitymembers = async (req, res) => {
+  try {
+      const community = await Community.findById(req.params.communityId).populate('members', 'username'); // Populate members with username
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest};
+      if (!community) {
+          return res.status(404).json({ message: 'Community not found.' });
+      }
+
+      // Map the populated members to include only necessary fields
+      const members = community.members.map(member => ({
+          _id: member._id,
+          username: member.username,
+      }));
+
+      res.status(200).json(members); // Return the members array
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error.' });
+  }
+};
+
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers};
