@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { AuthContext } from './authentication/Authcontext'; // Adjust the import path as needed
 
 const EnFeedback = () => {
   const { communityId } = useParams(); // Get communityId from the URL
+  const { userId } = useContext(AuthContext); // Get userId from AuthContext
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState(0);
   const [feedbacks, setFeedbacks] = useState([]); // Store fetched feedbacks
@@ -46,7 +48,7 @@ const EnFeedback = () => {
       // Post the feedback to the backend
       await axios.post(
         `http://localhost:5000/api/community/${communityId}/feedback`,
-        { feedbackmsg: feedback, rating },
+        { feedbackmsg: feedback, rating, userId }, // Include userId
         config
       );
 

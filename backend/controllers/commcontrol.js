@@ -363,27 +363,26 @@ const joinedByUserId = async (req, res) => {
 };
 
 const postfeedback = asyncWrap(async (req, res, next) => {
-
-  const { feedbackmsg, rating } = req.body;
+  const { feedbackmsg, rating, userId } = req.body; // Get userId from the request body
   const communityId = req.params.communityid; // ensure casing matches
 
   // Fetch community with populated creator details
   const community = await Community.findById(communityId).populate('creator'); // Ensure you populate the creator field
 
   if (!community) {
-      return res.status(404).json({ message: "Community not found" });
+    return res.status(404).json({ message: "Community not found" });
   }
 
-  // Get userId from the community's creator
-  const userId = community.creator._id; // Ensure you are accessing the correct field
+  // Get userId from the request (should be passed from frontend)
+  // let userId = community.creator._id; // Comment this line out
 
   let newFeedback = new Feedback({
-      feedbackmsg: feedbackmsg,
-      rating: rating,
-      community: communityId,
-      user: userId,
+    feedbackmsg: feedbackmsg,
+    rating: rating,
+    community: communityId,
+    user: userId, // Use the userId from the request
   });
-  
+
   await newFeedback.save();
   res.status(201).json({ message: "Feedback posted successfully!" });
 });
@@ -391,13 +390,12 @@ const postfeedback = asyncWrap(async (req, res, next) => {
 const getfeedback = asyncWrap(async (req, res, next) => {
   try {
     const communityId = req.params.communityid; // Fetching communityId from request parameters
-// Log the communityId
 
     // Fetch feedbacks for the community and populate user details
     const feedbacks = await Feedback.find({ community: communityId })
       .populate('user', 'username') // Populate 'user' with only the 'username'
       .sort({ createdAt: -1 }); // Sort by newest feedbacks first
-// Log the fetched feedbacks
+
     res.status(200).json(feedbacks);
   } catch (error) {
     console.error("Error fetching feedbacks:", error); // Log the error
