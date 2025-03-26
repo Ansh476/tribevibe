@@ -7,6 +7,7 @@ require('dotenv').config();
 const communityRoutes = require('./routes/communityroutes');
 const userRoutes = require('./routes/userroutes');
 const adminRoutes = require('./routes/adminroutes');
+const recomroutes = require('./routes/recomroutes');
 
 const port = 5000;
 
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use('/api/community', communityRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/recommendations', recomroutes); 
 
 mongoose
   .connect(process.env.MONGODB_URI) 
