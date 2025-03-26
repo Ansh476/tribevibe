@@ -29,6 +29,10 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    interest: {
+        type: [String],
+        required: true
+    },
     otp: {
         type: String,
         required: false,
