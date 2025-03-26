@@ -39,12 +39,14 @@ const Signup = () => {
   const onSubmit = async (data) => {
 
     const formData = {
+    const formData = {
       username: data.username,
       email: data.email,
       password: data.password,
       fullname: data.fullName,
       Phone: data.phone,  
       location: data.location ? data.location.value : '',
+      interest: data.interest ? data.interest.split(',').map(inter => inter.trim()) : [], 
     };
 
     try {
@@ -149,19 +151,13 @@ const Signup = () => {
 
           <div className="form-group">
             <label className="block text-gray-700 font-bold mb-2">Interests</label>
-            <Controller
-              name="interests"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  options={interestOptions}
-                  isMulti
-                  className="w-full"
-                  classNamePrefix="select"
-                />
-              )}
+            <input
+              type="text"
+              {...register('interest', { required: 'Please enter your interests' })} 
+              placeholder="Enter interests separated by commas (e.g., music, sports)"
+              className="w-full p-2 border border-gray-300 rounded-md"
             />
+            {errors.interest && <p className="text-red-500 text-sm mt-1">{errors.interest.message}</p>}
           </div>
           <div className="form-group flex items-center">
             <input
