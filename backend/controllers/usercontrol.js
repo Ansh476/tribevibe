@@ -14,7 +14,7 @@ const signup = async (req, res, next) => {
         return next(error);
     }
 
-    const { username, email, password, fullname, Phone, profilepic, location } = req.body;
+    const { username, email, password, fullname, Phone, profilepic, location,interest } = req.body;
 
     let existingUser;
     try {
@@ -30,6 +30,13 @@ const signup = async (req, res, next) => {
         return next(error);
     }
 
+    let formattedInterest = [];
+    if (typeof interest === 'string') {
+        formattedInterest = interest.split(',').map(item => item.trim()); 
+    } else if (Array.isArray(interest)) {
+        formattedInterest = interest; 
+    }
+
     const newUser = new User({
         username,
         email,
@@ -37,6 +44,7 @@ const signup = async (req, res, next) => {
         fullname,
         Phone,
         location,
+        interest: formattedInterest, 
         communitiesCreated: [],
         communitiesJoined: [],
     });
