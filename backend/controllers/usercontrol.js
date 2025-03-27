@@ -14,7 +14,7 @@ const signup = async (req, res, next) => {
         return next(error);
     }
 
-    const { username, email, password, fullname, Phone, profilepic, location,interest } = req.body;
+    const { username, email, password, fullname, Phone, age, profilepic, location,interest } = req.body;
 
     let existingUser;
     try {
@@ -43,6 +43,7 @@ const signup = async (req, res, next) => {
         password,
         fullname,
         Phone,
+        age,
         location,
         interest: formattedInterest, 
         communitiesCreated: [],

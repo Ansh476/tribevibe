@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import axios from 'axios'; 
 import { IoSearch } from "react-icons/io5";
 import EventList from './EventList'; 
+import RecommendedList from './Recomm';
+import { AuthContext } from './authentication/Authcontext'; 
+
 
 const Dashboard = () => {
     const [events, setEvents] = useState([]); 
     const [filteredEvents, setFilteredEvents] = useState([]); 
+    const [recommended, setRecommended] = useState([]); 
     const [searchText, setSearchText] = useState("");
     const [locationText, setLocationText] = useState("");
     const [isClicked, setIsClicked] = useState(false);
     const [TagText, setTagText] = useState("");
+    const { userId: contextUserId } = useContext(AuthContext); 
+    const [userId, setUserId] = useState(contextUserId || localStorage.getItem('userId'));
 
     const fetchData = async () => {
         try {
+           
             const response = await axios.get('http://localhost:5000/api/community');
             const communities = response.data.communities; 
             setEvents(communities); 
             setFilteredEvents(communities); 
+            const response2 = await axios.get(`http://localhost:5000/api/recommendations/${userId}`);
+            const recommendations = response2.data.recommendations;
+            const mergedRecommendations = [
+                ...(recommendations.interestBased || []),
+                ...(recommendations.collaborativeBased || [])
+            ];
+            setRecommended(mergedRecommendations);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -105,9 +119,15 @@ const Dashboard = () => {
                 </div>
             </div>
             <div className="text-[#BE07A2] font-poppins text-[55px] font-bold leading-[50px] mt-10 mb-10">
-                Explore
+                Recommended For You!
+            </div>
+            <RecommendedList events={recommended} />
+
+            <div className="text-[#BE07A2] font-poppins text-[55px] font-bold leading-[50px] mt-10 mb-10">
+                Explore More
             </div>
             <EventList events={filteredEvents} /> 
+           
         </div>
     );
 };

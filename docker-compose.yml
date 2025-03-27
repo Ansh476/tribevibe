@@ -1,0 +1,19 @@
+version: '3'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173" 
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb+srv://mahvish:lRH2ppyRrRH8OZJb@cluster0.3m3h0.mongodb.net/tribevibe?retryWrites=true&w=majority&appName=Cluster0
+
+networks:
+  app-network:
+    driver: bridge

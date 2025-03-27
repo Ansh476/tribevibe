@@ -15,9 +15,10 @@ async function getRecommendations(userId) {
 
         // ================= TF-IDF for Interest-Based Recommendations ================= //
         const tfidf = new natural.TfIdf();
+        
         const communityDocs = communities.map(c => ({
             id: c._id.toString(),
-            text: `${c.title} ${c.description} ${c.tags.join(" ")}`
+            text: `${c.title.repeat(2)} ${c.description} ${c.tags.join(" ").repeat(4)}` 
         }));
 
         communityDocs.forEach(doc => tfidf.addDocument(doc.text));
@@ -26,28 +27,29 @@ async function getRecommendations(userId) {
         const scores = [];
 
         tfidf.tfidfs(userInterests, (i, measure) => {
+            console.log(`Community: ${communityDocs[i].id} | Score: ${measure}`);
             scores.push({ id: communityDocs[i].id, score: measure });
         });
 
-        // Sort and filter interest-based communities
-        scores.sort((a, b) => b.score - a.score);
-        let topInterestCommunities = scores.slice(0, 3).map(s => s.id);
-
-        // Filter out already joined communities
-        topInterestCommunities = topInterestCommunities.filter(id => !joinedCommunities.has(id));
+        // ✅ **Filter out zero-score communities & sort**
+        const MIN_SCORE_THRESHOLD = 0.1;
+        let topInterestCommunities = scores
+            .filter(s => s.score > MIN_SCORE_THRESHOLD)  
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3)  // Take top 3 relevant ones
+            .map(s => s.id);
 
         // Fetch and populate full community data for interest-based recommendations
-        const interestBasedRecommendations = await Community.find({ 
-            _id: { $in: topInterestCommunities } 
+        const interestBasedRecommendations = await Community.find({
+            _id: { $in: topInterestCommunities }
         });
 
-        // ================= Collaborative Filtering ================= //
+        // ================= Collaborative Filtering (Untouched) ================= //
         const similarUsersQuery = await User.find({
             _id: { $ne: userId },
             communitiesJoined: { $in: [...user.communitiesJoined] }
         });
 
-        // Collect all unique communities from similar users
         const allNewCommunities = new Set();
         similarUsersQuery.forEach(similarUser => {
             similarUser.communitiesJoined.forEach(communityId => {
@@ -58,13 +60,11 @@ async function getRecommendations(userId) {
             });
         });
 
-        // Convert to array and shuffle to get random recommendations on each reload
         const shuffledCommunities = [...allNewCommunities].sort(() => 0.5 - Math.random());
         const selectedCommunityIds = shuffledCommunities.slice(0, 2);
 
-        // Fetch recommended collaborative communities
-        const collaborativeBasedRecommendations = await Community.find({ 
-            _id: { $in: selectedCommunityIds } 
+        const collaborativeBasedRecommendations = await Community.find({
+            _id: { $in: selectedCommunityIds }
         });
 
         return {
@@ -77,5 +77,6 @@ async function getRecommendations(userId) {
         return { recommendations: [] };
     }
 }
+
 
 module.exports = { getRecommendations };

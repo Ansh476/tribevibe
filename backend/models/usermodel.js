@@ -25,6 +25,9 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    age: {
+        type: String
+    },
     location:{
         type: String,
         required: true
