@@ -1,38 +1,35 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { AuthContext } from './authentication/Authcontext'; // Adjust the import path as needed
+import { AuthContext } from './authentication/Authcontext'; 
 
 const EnFeedback = () => {
-  const { communityId } = useParams(); // Get communityId from the URL
-  const { userId } = useContext(AuthContext); // Get userId from AuthContext
+  const { communityId } = useParams(); 
+  const { userId } = useContext(AuthContext); 
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState(0);
-  const [feedbacks, setFeedbacks] = useState([]); // Store fetched feedbacks
+  const [feedbacks, setFeedbacks] = useState([]); 
   const [error, setError] = useState(null);
 
-  // Fetch feedbacks on component mount
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
         const response = await axios.get(
           `http://localhost:5000/api/community/${communityId}/feedback`
         );
-        console.log("Feedbacks fetched:", response.data); // Log the fetched feedbacks
-        setFeedbacks(response.data); // Store feedback data in state
+        console.log("Feedbacks fetched:", response.data); 
+        setFeedbacks(response.data); 
       } catch (error) {
-        console.error('Error fetching feedbacks:', error.response || error.message); // Log error response
+        console.error('Error fetching feedbacks:', error.response || error.message); 
       }
     };
   
-    fetchFeedbacks(); // Initial fetch when component mounts
+    fetchFeedbacks(); 
   }, [communityId]); 
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure both rating and feedback are provided
     if (!rating || !feedback) {
       setError('Please provide both feedback and a rating.');
       return;
@@ -45,20 +42,28 @@ const EnFeedback = () => {
         },
       };
 
-      // Post the feedback to the backend
+      const spamCheckResponse = await axios.post(
+        'http://127.0.0.1:5000/predict',
+        { text: feedback },
+        config
+      );
+    
+      if (spamCheckResponse.data.spam) {
+        alert('Your feedback was detected as spam. Please modify your message.');
+        return; 
+      }
+   
       await axios.post(
         `http://localhost:5000/api/community/${communityId}/feedback`,
-        { feedbackmsg: feedback, rating, userId }, // Include userId
+        { feedbackmsg: feedback, rating, userId }, 
         config
       );
 
-      // Show success message as an alert
       alert('Feedback posted successfully!');
-      setError(null); // Clear any existing error
-      setFeedback(''); // Clear the feedback input
-      setRating(0); // Reset the rating
+      setError(null); 
+      setFeedback(''); 
+      setRating(0); 
 
-      // Refetch the feedbacks to update the list
       const updatedFeedbacks = await axios.get(
         `http://localhost:5000/api/community/${communityId}/feedback`
       );
