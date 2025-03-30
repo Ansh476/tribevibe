@@ -3,6 +3,7 @@ const User = require('../models/usermodel');
 const Announcement = require('../models/announce')
 const HttpError = require('../models/HttpError');
 const Feedback = require('../models/feedback');
+const Spam = require('../models/spam');
 const { cloudinary } = require('../cloudConfig');
 
 require('dotenv').config();
@@ -387,6 +388,30 @@ const postfeedback = asyncWrap(async (req, res, next) => {
   res.status(201).json({ message: "Feedback posted successfully!" });
 });
 
+const postspam = asyncWrap(async (req, res, next) => {
+  const { feedbackmsg, rating, userId } = req.body;
+  const communityId = req.params.communityid; 
+
+  const community = await Community.findById(communityId).populate('creator'); 
+
+  if (!community) {
+    return res.status(404).json({ message: "Community not found" });
+  }
+
+  // Get userId from the request (should be passed from frontend)
+  // let userId = community.creator._id; // Comment this line out
+
+  let newSpam = new Spam({
+    spammsg: feedbackmsg,
+    rating: rating,
+    community: communityId,
+    user: userId, 
+  });
+
+  await newSpam.save();
+  res.status(201).json({ message: "Spam posted successfully!" });
+});
+
 const getfeedback = asyncWrap(async (req, res, next) => {
   try {
     const communityId = req.params.communityid; // Fetching communityId from request parameters
@@ -432,7 +457,7 @@ const getRequests = async (req, res) => {
           username: request.username,
       }));
 
-      res.status(200).json(joinRequests); // Return the array
+      res.status(200).json(joinRequests); 
   } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error.' });
@@ -555,4 +580,4 @@ const getUserCount = async (req, res, next) => {
 
 
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers, removeCommunityMember, getUserCount};
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers, removeCommunityMember, getUserCount, postspam};

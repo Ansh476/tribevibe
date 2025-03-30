@@ -31,7 +31,7 @@ async function getRecommendations(userId) {
             scores.push({ id: communityDocs[i].id, score: measure });
         });
 
-        // ✅ **Filter out zero-score communities & sort**
+        //  **Filter out zero-score communities & sort**
         const MIN_SCORE_THRESHOLD = 0.1;
         let topInterestCommunities = scores
             .filter(s => s.score > MIN_SCORE_THRESHOLD)  

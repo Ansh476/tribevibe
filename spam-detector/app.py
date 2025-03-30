@@ -73,7 +73,6 @@ def predict():
         return jsonify({"spam": False}) 
     
     prediction = model.predict([cleaned_text])  
-    print(f"text : {cleaned_text} , reposnse : {bool(prediction[0])}")
 
     return jsonify({"spam": bool(prediction[0])}) 
 

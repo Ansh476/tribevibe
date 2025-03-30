@@ -50,6 +50,13 @@ const EnFeedback = () => {
     
       if (spamCheckResponse.data.spam) {
         alert('Your feedback was detected as spam. Please modify your message.');
+
+        await axios.post(
+          `http://localhost:5000/api/community/${communityId}/spam`,
+          { feedbackmsg: feedback, rating, userId }, 
+          config
+        );
+        
         return; 
       }
    

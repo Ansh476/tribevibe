@@ -22,6 +22,7 @@ router.delete('/:communityid/announcement/:announcementId', commcontroller.delet
 router.delete('/:communityid/removeuser/:userId', commcontroller.removeuser)
 
 router.post('/:communityid/feedback', commcontroller.postfeedback)
+router.post('/:communityid/spam', commcontroller.postspam)
 
 router.get('/:communityid/feedback', commcontroller.getfeedback)
 router.post('/upload', upload.single('image'), commcontroller.uploadImage);
