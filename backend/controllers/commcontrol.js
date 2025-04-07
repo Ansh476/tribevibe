@@ -253,8 +253,7 @@ const postannouncement = async (req, res, next) => {
 
 const getannouncement = asyncWrap(async (req, res, next) => {
   try {
-      const communityId = req.params.communityid; // Fetching communityId from request parameters
-      console.log("Fetching announcements for community ID:", communityId); // Log the communityId
+      const communityId = req.params.communityid; 
 
       // Fetch announcements for the community and sort them by createdAt
       const announcements = await Announcement.find({ community: communityId })
@@ -545,10 +544,7 @@ const removeCommunityMember = async (req, res) => {
       }
 
       community.members = community.members.filter(member => !member.equals(_id));
-      // community.joinRequests = community.joinRequests.filter(req => !req.equals(_id));
       await community.save();
-
-      console.log("passed this point");
 
       await User.updateOne(
         { _id: user._id },
@@ -578,6 +574,64 @@ const getUserCount = async (req, res, next) => {
   }
 };
 
+const getSpamMessages = async (req, res) => {
+  try {
+    const communityId = req.params.communityId;
+
+    const spamMessages = await Spam.find({ community: communityId }).sort({ createdAt: -1 });
+
+    const userIds = [...new Set(spamMessages.map(msg => msg.user))];
+
+    const users = await User.find({ _id: { $in: userIds } }, 'username');
+
+    const userMap = {};
+    users.forEach(user => {
+      userMap[user._id.toString()] = user.username;
+    });
+
+    const enrichedSpamMessages = spamMessages.map(msg => {
+      return {
+        ...msg.toObject(),
+        username: userMap[msg.user] || 'Unknown' 
+      };
+    });
 
 
-module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers, removeCommunityMember, getUserCount, postspam};
+    res.status(200).json(enrichedSpamMessages);
+  } catch (error) {
+    console.error('Error fetching spam messages:', error);
+    res.status(500).json({ message: 'Error fetching spam messages' });
+  }
+};
+
+const markAsNotSpam = async (req, res) => {
+  try {
+    const communityId = req.params.communityId;
+    const { _id } = req.body;
+
+    const spamMessage = await Spam.findOne({ _id });
+
+    if (!spamMessage) {
+      return res.status(404).json({ message: 'Spam message not found' });
+    }
+
+    const feedbackData = {
+      feedbackmsg: spamMessage.spammsg, 
+      rating: spamMessage.rating,
+      community: spamMessage.community,
+      user: spamMessage.user,
+    };
+
+    await Feedback.create(feedbackData);
+    await Spam.deleteOne({ _id });
+
+    res.status(200).json({ message: 'Message moved to feedback' });
+  } catch (error) {
+    console.error('Error moving message to feedback:', error);
+    res.status(500).json({ message: 'Failed to move message to feedback' });
+  }
+};
+
+
+
+module.exports = { createcommunity, joinCommunity, getallComm, getCommDetails,updateComm, deleteComm, getCreatorcomm,postannouncement,deleteannouncement,removeuser,postfeedback,getfeedback, uploadImage, getCommunitiesByUserId, joinedByUserId, exitCommunity, getCommunitiesByTags, getannouncement, getRequests, acceptRequest, rejectRequest, getCommunitymembers, removeCommunityMember, getUserCount, postspam, getSpamMessages, markAsNotSpam};

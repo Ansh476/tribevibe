@@ -37,4 +37,7 @@ router.get('/:communityId/members', commcontroller.getCommunitymembers);
 router.put('/:communityId/removemember', commcontroller.removeCommunityMember);
 router.get('/:communityId/usercount',commcontroller.getUserCount);
 
+router.get('/:communityId/getspam', commcontroller.getSpamMessages);
+router.post('/:communityId/mark-not-spam', commcontroller.markAsNotSpam);
+
 module.exports = router;

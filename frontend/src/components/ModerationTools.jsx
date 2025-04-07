@@ -1,125 +1,80 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
-const ModerationTools = () => {
-    const [chats, setChats] = useState([]);
-    const [reportedContent, setReportedContent] = useState([]);
-    const [isChatRoomDisabled, setIsChatRoomDisabled] = useState(false);
-    const [keywordFilters, setKeywordFilters] = useState([]);
-    const [newKeyword, setNewKeyword] = useState('');
+const SpamMessages = () => {
+    const [spamMessages, setSpamMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const { communityId } = useParams();
 
     useEffect(() => {
-        // Fetch initial data for chats and reported content
-        fetchChats();
-        fetchReportedContent();
-    }, []);
+        const fetchSpamMessages = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/community/${communityId}/getspam`);
+                setSpamMessages(response.data);
+                console.log(response.data);
+            } catch (error) {
+                setError("Failed to fetch spam messages.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const fetchChats = () => {
-        // Mock fetching chats from an API
-        setChats([
-            { id: 1, user: 'User1', message: 'Hello world' },
-            { id: 2, user: 'User2', message: 'Reported message' },
-            // More chats...
-        ]);
-    };
+        fetchSpamMessages();
+    }, [communityId]);
 
-    const fetchReportedContent = () => {
-        // Mock fetching reported content from an API
-        setReportedContent([
-            { id: 1, user: 'User2', message: 'Reported message', reason: 'Inappropriate' },
-            // More reported content...
-        ]);
-    };
-
-    const handleDeleteChat = (chatId) => {
-        setChats(chats.filter(chat => chat.id !== chatId));
-    };
-
-    const handleDisableChatRoom = () => {
-        setIsChatRoomDisabled(!isChatRoomDisabled);
-    };
-
-    const handleAddKeyword = () => {
-        if (newKeyword) {
-            setKeywordFilters([...keywordFilters, newKeyword]);
-            setNewKeyword('');
+    const handleNotSpam = async (_id) => {
+        try {
+            await axios.post(`http://localhost:5000/api/community/${communityId}/mark-not-spam`, {
+                _id
+            });
+  
+            setSpamMessages(prev => prev.filter(msg => msg._id !== _id));
+        } catch (error) {
+            setError("Failed to mark message as not spam.");
         }
     };
 
-    const handleRemoveKeyword = (keyword) => {
-        setKeywordFilters(keywordFilters.filter(k => k !== keyword));
-    };
-
     return (
-        <div className="w-full h-auto bg-[#f3f4f6] py-16">
-            <div className="max-w-6xl mx-auto px-6">
-                <h1 className="text-center text-4xl font-bold text-[#0c87f2] mb-8">Moderation Tools</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                    <div className="bg-[#e7f2fe] p-6 rounded-lg shadow-lg">
-                        <h2 className="text-2xl font-semibold text-[#0a171f] mb-4">Delete Chats</h2>
-                        <ul>
-                            {chats.map(chat => (
-                                <li key={chat.id} className="flex justify-between items-center mb-2">
-                                    <span>{chat.user}: {chat.message}</span>
-                                    <button
-                                        onClick={() => handleDeleteChat(chat.id)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded">
-                                        Delete
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="bg-[#f7e9c7] p-6 rounded-lg shadow-lg">
-                        <h2 className="text-2xl font-semibold text-[#0a171f] mb-4">Reported Content</h2>
-                        <ul>
-                            {reportedContent.map(content => (
-                                <li key={content.id} className="mb-2">
-                                    <span>{content.user}: {content.message} (Reason: {content.reason})</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="bg-[#f0f4ff] p-6 rounded-lg shadow-lg">
-                        <h2 className="text-2xl font-semibold text-[#0a171f] mb-4">Disable Chat Room</h2>
-                        <button
-                            onClick={handleDisableChatRoom}
-                            className={`px-4 py-2 rounded ${isChatRoomDisabled ? 'bg-green-500' : 'bg-red-500'} text-white`}>
-                            {isChatRoomDisabled ? 'Enable Chat Room' : 'Disable Chat Room'}
-                        </button>
-                    </div>
-                    <div className="bg-[#e0ffec] p-6 rounded-lg shadow-lg">
-                        <h2 className="text-2xl font-semibold text-[#0a171f] mb-4">Keyword Filters</h2>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                value={newKeyword}
-                                onChange={(e) => setNewKeyword(e.target.value)}
-                                placeholder="Add new keyword"
-                                className="px-3 py-2 border rounded mr-2"
-                            />
+        <div className="w-[1058px] h-[671px] relative bg-white/25 rounded-[15px] shadow-lg p-6">
+            <div className="text-center text-black text-[32px] font-semibold font-['League Spartan'] leading-[50px] mb-6">
+                Manage Spam Messages
+            </div>
+            <div className="bg-white rounded-lg shadow-lg max-h-[500px] overflow-y-auto p-4">
+                <h2 className="text-lg font-semibold text-[#0a171f] mb-4 font-['League Spartan']">Spam List:</h2>
+                {loading ? (
+                    <div className="text-center text-gray-500">Loading spam messages...</div>
+                ) : error ? (
+                    <div className="text-center text-red-500">{error}</div>
+                ) : spamMessages.length > 0 ? (
+                    spamMessages.map(message => (
+                        <div key={message._id} className="flex justify-between items-center py-2 border-b border-gray-200">
+                          <div>
+                            <div className="text-md text-[#393433] font-medium">
+                              {message.username || "Unknown User"}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {message.spammsg}
+                            </div>
+                          </div>
+                          <div>
                             <button
-                                onClick={handleAddKeyword}
-                                className="bg-blue-500 text-white px-3 py-2 rounded">
-                                Add
+                              onClick={() => handleNotSpam(message._id)} 
+                              className="px-4 py-2 bg-[#008000] text-white text-sm font-semibold rounded-lg shadow-md hover:bg-green-700"
+                            >
+                              Mark as Not Spam
                             </button>
+                          </div>
                         </div>
-                        <ul>
-                            {keywordFilters.map(keyword => (
-                                <li key={keyword} className="flex justify-between items-center mb-2">
-                                    <span>{keyword}</span>
-                                    <button
-                                        onClick={() => handleRemoveKeyword(keyword)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded">
-                                        Remove
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
+                      ))
+                      
+                ) : (
+                    <div className="text-center text-gray-500">No spam messages found.</div>
+                )}
             </div>
         </div>
     );
 };
 
-export default ModerationTools;
+export default SpamMessages;
