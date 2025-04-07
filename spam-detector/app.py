@@ -4,6 +4,8 @@ import pickle
 from flask import Flask, request, jsonify
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from flask_cors import CORS
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -49,9 +51,30 @@ def clean_text(text):
 
     return ' '.join(words)
 
+# with open('hybrid_recommender_model.pkl', 'rb') as f:
+#     knn = pickle.load(f)
+
+with open('tfidf_vectorizer.pkl', 'rb') as f:
+    tfidf_vectorizer = pickle.load(f)
+
+communities_df = pd.read_csv('communities_df.csv')
+communities_df['combined'] = communities_df['description'].astype(str) + ' ' + communities_df['categories'].astype(str)
+tfidf_matrix = tfidf_vectorizer.transform(communities_df['combined'])
 
 app = Flask(__name__)
 CORS(app)
+
+def vectorize_user_interests(user_interests):
+    return tfidf_vectorizer.transform([user_interests])
+
+def get_content_based_recommendations(user_interests, top_n=5):
+    user_vector = vectorize_user_interests(user_interests)
+    similarity_scores = cosine_similarity(user_vector, tfidf_matrix)
+    similarity_df = pd.DataFrame(similarity_scores.T, columns=['similarity_score'])
+    similarity_df['community_id'] = communities_df['Id']
+    similarity_df = similarity_df.sort_values(by='similarity_score', ascending=False)
+    return similarity_df.head(top_n)
+
 
 with open("spam_detection_model.pkl", "rb") as file:
     model = pickle.load(file)
@@ -75,6 +98,32 @@ def predict():
     prediction = model.predict([cleaned_text])  
 
     return jsonify({"spam": bool(prediction[0])}) 
+
+
+@app.route('/recommend-tags', methods=['POST'])
+def recommend_tags():
+    data = request.get_json()
+    title = data.get('title', '')
+    description = data.get('description', '')
+
+    if not title and not description:
+        return jsonify({'error': 'Missing title or description'}), 400
+
+    combined_input = title + ' ' + description
+    input_vector = tfidf_vectorizer.transform([combined_input])
+    similarity_scores = cosine_similarity(input_vector, tfidf_matrix).flatten()
+
+    top_indices = similarity_scores.argsort()[-5:][::-1]
+    top_categories = communities_df.iloc[top_indices]['categories']
+
+    tags = []
+    for cats in top_categories:
+        tags.extend([c.strip() for c in cats.split(',') if c.strip()])
+
+    from collections import Counter
+    most_common_tags = [tag for tag, _ in Counter(tags).most_common(5)]
+
+    return jsonify({'recommended_tags': most_common_tags})
 
 if __name__ == '__main__':
     app.run(debug=True)
