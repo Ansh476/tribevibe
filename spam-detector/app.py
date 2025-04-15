@@ -75,7 +75,6 @@ def get_content_based_recommendations(user_interests, top_n=5):
     similarity_df = similarity_df.sort_values(by='similarity_score', ascending=False)
     return similarity_df.head(top_n)
 
-
 with open("spam_detection_model.pkl", "rb") as file:
     model = pickle.load(file)
 

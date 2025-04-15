@@ -2,22 +2,35 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from "./authentication/Authcontext"; 
+import { AuthContext } from "./authentication/Authcontext";
 
 const CreateComForm = () => {
-  const { userId: contextUserId } = useContext(AuthContext); 
+  const { userId: contextUserId } = useContext(AuthContext);
   const [userId, setUserId] = useState(contextUserId || localStorage.getItem('userId'));
   const [popupVisible, setPopupVisible] = useState(false);
-  const [tags, setTags] = useState(''); 
-  const navigate = useNavigate();
+  const [tags, setTags] = useState('');
+  const [loadingTags, setLoadingTags] = useState(false);
+  const [tagError, setTagError] = useState('');
 
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid }
+  } = useForm({
+    mode: 'onChange',
+  });
 
   const onSubmit = async (data) => {
     try {
+      if (!tags.trim()) {
+        setTagError('Tags are required');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('image', data.image[0]);
-
       const response = await axios.post('http://localhost:5000/api/community/upload', formData);
       const imageUrl = response.data.url;
 
@@ -34,31 +47,62 @@ const CreateComForm = () => {
         approval: data.approval,
         imageurl: String(imageUrl),
         creator: userId,
-        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''), // Split tags into an array and filter out empty tags
+        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
       };
 
-      console.log(completeFormData);
       await axios.post('http://localhost:5000/api/community/create', completeFormData);
-
       setPopupVisible(true);
       setTimeout(() => {
         setPopupVisible(false);
         navigate('/dashboard');
       }, 2000);
-
     } catch (error) {
       console.error('Error during submission:', error);
       alert('There was an error uploading the form.');
     }
   };
 
-  // Handle case when userId changes in AuthContext
   useEffect(() => {
     if (contextUserId) {
       setUserId(contextUserId);
-      localStorage.setItem('userId', contextUserId); // Sync with local storage
+      localStorage.setItem('userId', contextUserId);
     }
   }, [contextUserId]);
+
+  const suggestTagsFromGemini = async () => {
+    const title = watch('title') || '';
+    const description = watch('description') || '';
+
+    if (!title && !description) {
+      setTagError('Please enter a title or description first');
+      return;
+    }
+
+    setTagError('');
+    setLoadingTags(true);
+
+    try {
+      console.log('Sending tag suggestion request with:', { title, description });
+
+      const res = await axios.post('http://localhost:5000/api/gemini/suggest-tags', {
+        title,
+        description,
+      });
+
+      console.log('Tag suggestion response:', res.data);
+
+      if (res.data?.tags?.length) {
+        setTags(res.data.tags.join(', '));
+      } else {
+        setTagError("No tags were generated. Try adding more details to your title and description.");
+      }
+    } catch (err) {
+      console.error("Error suggesting tags:", err.response?.data || err.message);
+      setTagError('Failed to generate tags. Please try again or enter tags manually.');
+    } finally {
+      setLoadingTags(false);
+    }
+  };
 
   return (
     <div className="h-auto bg-gradient-to-r from-primary to-secondary flex items-center justify-center py-10 mt-10">
@@ -69,11 +113,9 @@ const CreateComForm = () => {
           </div>
         </div>
       )}
-
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Your Community!</h2>
 
-        {/* Title */}
         <div className="mb-6">
           <input
             type="text"
@@ -84,7 +126,6 @@ const CreateComForm = () => {
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
-        {/* Description */}
         <div className="mb-6">
           <textarea
             placeholder="Description"
@@ -94,7 +135,6 @@ const CreateComForm = () => {
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
 
-        {/* Location */}
         <div className="mb-6">
           <input
             type="text"
@@ -105,120 +145,115 @@ const CreateComForm = () => {
           {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>}
         </div>
 
-        {/* Tags */}
+        {/* Tags with Suggest Button */}
+        <div className="mb-6">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Enter tags separated by commas"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              value={tags}
+              onChange={(e) => {
+                setTags(e.target.value);
+                if (e.target.value.trim()) setTagError('');
+              }}
+            />
+            <button
+              type="button"
+              onClick={suggestTagsFromGemini}
+              className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+              disabled={loadingTags || (!watch('title') && !watch('description'))}
+            >
+              {loadingTags ? "Loading..." : "Suggest"}
+            </button>
+          </div>
+          {(tags === '' || tagError) && (
+            <p className="text-red-500 text-sm mt-1">{tagError || "Tags are required"}</p>
+          )}
+        </div>
+
         <div className="mb-6">
           <input
             type="text"
-            placeholder="Enter tags separated by commas"
+            placeholder="Age Group"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)} // Update the tags state on change
+            {...register('ageGroup')}
           />
-          {tags === '' && <p className="text-red-500 text-sm mt-1">Tags are required</p>} {/* Error handling for tags */}
         </div>
 
-        {/* Age Group */}
-        <div className="mb-6">
-          <div className="mt-2">
-            <label className="mr-4">
-              <input type="radio" value="Above 18" {...register('ageGroup', { required: 'Select Age Group' })} /> Above 18
-            </label>
-            <label>
-              <input type="radio" value="Open for All" {...register('ageGroup', { required: 'Select Age Group' })} /> Open for All
-            </label>
-          </div>
-          {errors.ageGroup && <p className="text-red-500 text-sm mt-1">{errors.ageGroup.message}</p>}
-        </div>
-
-        {/* Date */}
         <div className="mb-6">
           <input
             type="date"
+            placeholder="Date"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-            {...register('date', { required: 'Date is required' })}
+            {...register('date')}
           />
-          {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>}
         </div>
 
-        {/* Time */}
         <div className="mb-6">
           <input
             type="time"
+            placeholder="Time"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-            {...register('time', { required: 'Time is required' })}
+            {...register('time')}
           />
-          {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time.message}</p>}
         </div>
 
-        {/* Gender */}
         <div className="mb-6">
-          <div className="mt-2">
-            <label className="mr-4">
-              <input type="radio" value="Male" {...register('gender', { required: 'Select Gender' })} /> Male
-            </label>
-            <label className="mr-4">
-              <input type="radio" value="Female" {...register('gender', { required: 'Select Gender' })} /> Female
-            </label>
-            <label className="mr-4">
-              <input type="radio" value="Other" {...register('gender', { required: 'Select Gender' })} /> Other
-            </label>
-            <label>
-              <input type="radio" value="All" {...register('gender', { required: 'Select Gender' })} /> All
-            </label>
-          </div>
-          {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>}
+          <select
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            {...register('gender')}
+          >
+            <option value="">Select Gender</option>
+            <option value="Any">Any</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
         </div>
 
-        {/* Members Count */}
         <div className="mb-6">
           <input
             type="number"
-            placeholder="Number of Members"
+            placeholder="Members"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-            {...register('members', { required: 'Number of members is required' })}
+            {...register('members')}
           />
-          {errors.members && <p className="text-red-500 text-sm mt-1">{errors.members.message}</p>}
-        </div>
-
-        {/* Payment Status */}
-        <div className="mb-6">
-          <div className="mt-2">
-            <label className="mr-4">
-              <input type="radio" value="Paid" {...register('payment', { required: 'Select Payment Status' })} /> Paid
-            </label>
-            <label>
-              <input type="radio" value="Unpaid" {...register('payment', { required: 'Select Payment Status' })} /> Unpaid
-            </label>
-          </div>
-          {errors.payment && <p className="text-red-500 text-sm mt-1">{errors.payment.message}</p>}
         </div>
 
         <div className="mb-6">
-          <div className="mt-2">
-            <label className="mr-4">
-              <input type="radio" value="Open Community" {...register('approval', { required: 'Community Type' })} /> Open Community
-            </label>
-            <label className="mr-4">
-              <input type="radio" value="Approved Only" {...register('approval', { required: 'Community Type' })} /> Approved Only
-            </label>
-          </div>
-          {errors.approval && <p className="text-red-500 text-sm mt-1">{errors.approval.message}</p>}
+          <select
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            {...register('payment')}
+          >
+            <option value="">Payment Status</option>
+            <option value="Free">Free</option>
+            <option value="Paid">Paid</option>
+          </select>
         </div>
 
-        {/* Image Upload */}
+        <div className="mb-6">
+          <select
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            {...register('approval')}
+          >
+            <option value="">Approval</option>
+            <option value="Approved">Approved</option>
+            <option value="Unapproved">Unapproved</option>
+          </select>
+        </div>
+
         <div className="mb-6">
           <input
             type="file"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-            {...register('image', { required: 'Image is required' })}
+            {...register('image')}
           />
-          {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
         </div>
 
         <button
           type="submit"
-          className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
-          disabled={!isValid}
+          className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+          disabled={!isValid || !tags.trim()}
         >
           Create Community
         </button>
