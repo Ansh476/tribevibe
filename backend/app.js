@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userroutes');
 const adminRoutes = require('./routes/adminroutes');
 const recomroutes = require('./routes/recomroutes');
 const geminiTagsRoute = require('./routes/geminiTags');
+const threadRoutes = require('./routes/threadroutes');
 
 const port = 5000;
 
@@ -21,6 +22,7 @@ app.use('/api/community', communityRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/recommendations', recomroutes); 
+app.use('/api/threads', threadRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI) 

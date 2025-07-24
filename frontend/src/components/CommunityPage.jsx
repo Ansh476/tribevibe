@@ -4,7 +4,8 @@ import { useParams } from 'react-router-dom'; // Use useParams to access communi
 import axios from 'axios'; // Import axios for making API calls
 import EnFeedback from './EnFeedback'; // Adjust the import path as needed
 import Announcements from './Announcements';
-import ChatRoom from './ChatRoom';
+// import ChatRoom from './ChatRoom';
+import Threads from './Threads';
 
 function CommunityPage() {
     const { communityId } = useParams(); // Get communityId from URL parameters
@@ -43,8 +44,8 @@ function CommunityPage() {
     // Render the active component
     const renderComponent = () => {
         switch (activeComponent) {
-            case 'ChatRoom':
-                return <ChatRoom />;
+            case 'Threads':
+                return <Threads />;
             case 'Announcements':
                 return <Announcements />;
             case 'Feedback':
@@ -69,8 +70,8 @@ function CommunityPage() {
                 <div className="w-full bg-white rounded-[15px] shadow p-4">
                     <div className="flex justify-around mb-4">
                         <button
-                            onClick={() => setActiveComponent('ChatRoom')}
-                            className={`w-full max-w-[200px] py-2 px-4 rounded-[10px] ${activeComponent === 'ChatRoom' ? 'bg-[#f4f3fe]' : ''} text-[#bd06a2] text-[16px] md:text-[32px] font-semibold font-['League Spartan'] text-center`}
+                            onClick={() => setActiveComponent('Threads')}
+                            className={`w-full max-w-[200px] py-2 px-4 rounded-[10px] ${activeComponent === 'Threads' ? 'bg-[#f4f3fe]' : ''} text-[#bd06a2] text-[16px] md:text-[32px] font-semibold font-['League Spartan'] text-center`}
                         >
                             ChatRoom
                         </button>
