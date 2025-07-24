@@ -19,22 +19,30 @@ const Dashboard = () => {
 
     const fetchData = async () => {
         try {
-           
             const response = await axios.get('http://localhost:5000/api/community');
-            const communities = response.data.communities; 
-            setEvents(communities); 
-            setFilteredEvents(communities); 
+            const communities = response.data.communities;
+            setEvents(communities);
+            setFilteredEvents(communities);
+    
             const response2 = await axios.get(`http://localhost:5000/api/recommendations/${userId}`);
             const recommendations = response2.data.recommendations;
+    
             const mergedRecommendations = [
                 ...(recommendations.interestBased || []),
                 ...(recommendations.collaborativeBased || [])
             ];
-            setRecommended(mergedRecommendations);
+    
+            // Remove duplicates based on _id
+            const uniqueRecommendations = Array.from(
+                new Map(mergedRecommendations.map(item => [item._id, item])).values()
+            );
+    
+            setRecommended(uniqueRecommendations);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
+    
 
     useEffect(() => {
         fetchData();
